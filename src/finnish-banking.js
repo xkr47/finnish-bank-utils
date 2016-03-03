@@ -1,0 +1,111 @@
+'use strict'
+
+const REF_NUMBER_MULTIPLIERS = [1, 3, 7],
+      REF_NUMBER_REGEX =  /[\d]{4,20}/,
+      FINNISH_IBAN_REGEX = /^FI[\d]{16}$/,
+      IBAN_OFFSET_FROM_ASCIICODE = -55
+
+function removeAllWhiteSpaces(str) {
+  return str.replace(/\s+/g, '');
+}
+
+function removeLeadingZeros(str) {
+  return str.replace(/^0+/, '');
+}
+
+function   countryCodeToNumber(code) {
+  return "" +
+         (code.charCodeAt(0) + IBAN_OFFSET_FROM_ASCIICODE) +
+         (code.charCodeAt(1) + IBAN_OFFSET_FROM_ASCIICODE)
+}
+
+/** JS number type can't handle the long account numbers... */
+function modForLargeNumber(base, divider) {
+  let div = '';
+  for (let i = 0; i < base.length; i++) {
+    div = parseInt(div + base[i], 10)
+    if (div >= divider) {
+      const mod = div % divider
+      if (i == base.length - 1) {
+        return mod
+      } else {
+        div = mod
+      }
+    }
+  }
+  return parseInt(div, 10)
+}
+
+const FinnishBusinessUtils = {
+
+  /**
+   * Validate parameter given finnish banking reference number.
+   * Allows grouping of numbers with whitespace.
+   * @param refNumber - {String} Reference number to parse, for example: 1234 56789 123123
+   * @returns {boolean}
+   */
+  isValidRefNumber(refNumber) {
+    //  Sanity and format check, which allows to make safe assumptions on the format.
+    if (!refNumber || typeof refNumber !== 'string' || !REF_NUMBER_REGEX.test(removeAllWhiteSpaces(refNumber))) {
+      return false
+    }
+
+    refNumber = removeAllWhiteSpaces(refNumber)
+    refNumber = removeLeadingZeros(refNumber)
+
+    let checksum = 0,
+        refNumberLengthNoChecksum = refNumber.length - 1,
+        checksumNumber
+
+    for (let i = 0; i < refNumberLengthNoChecksum; i++) {
+      checksum += REF_NUMBER_MULTIPLIERS[i % REF_NUMBER_MULTIPLIERS.length] * parseInt(refNumber.charAt(i), 10)
+    }
+
+    checksumNumber = 10 - checksum % 10;
+
+    if (checksumNumber === 10) {
+      checksumNumber = 0
+    }
+    return checksumNumber === parseInt(refNumber.charAt(refNumberLengthNoChecksum))
+  },
+
+  /**
+   * Validate finnish IBAN. Allows grouping of numbers with whitespace.
+   * https://fi.wikipedia.org/wiki/IBAN
+   *
+   * @param accountNumber - {String} Account number to validate: FI 90 800026 2776 1348
+   * @returns {boolean}
+   */
+  isValidFinnishIBAN(accountNumber) {
+    return this.isValidIBAN(accountNumber) && accountNumber.indexOf('FI') !== -1
+  },
+
+  /**
+   * Validate international IBAN. Allows grouping of numbers with whitespace.
+   * https://fi.wikipedia.org/wiki/IBAN
+   *
+   * @param accountNumber - {String} Account number to validate: FI 90 800026 2776 1348
+   * @returns {boolean}
+   */
+  isValidIBAN(accountNumber) {
+    //  quick sanity check against regex, to make parsing safer later
+    if (!accountNumber || typeof accountNumber !== 'string' || !FINNISH_IBAN_REGEX.test(removeAllWhiteSpaces(accountNumber))) {
+      return false
+    }
+
+    accountNumber = removeAllWhiteSpaces(accountNumber);
+    const localAccountNumber = accountNumber.substring(4, 18),
+        countryCode = accountNumber.substring(0, 2),
+        checksum = accountNumber.substring(2, 4)
+
+    return modForLargeNumber(localAccountNumber +
+                             countryCodeToNumber(countryCode) +
+                             checksum, 97) === 1
+  },
+
+  generateReferenceNumber() {
+    return '1234561'
+  }
+}
+
+module.exports = FinnishBusinessUtils
