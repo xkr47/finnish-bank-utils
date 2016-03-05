@@ -44,6 +44,21 @@ function modForLargeNumber(base, divisor) {
   return parseInt(dividend, 10)
 }
 
+/** Luhn mod 10 algorithm https://en.wikipedia.org/wiki/Luhn_algorithm */
+function luhnMod10(value) {
+  let sum = 0
+  for (let i = 0; i < value.length; i++) {
+    const multiplier = (i % 2 === 0) ? 2 : 1
+    let add = multiplier * parseInt(value[i], 10)
+    if (add >= 10) {
+      add -= 9
+    }
+    sum += add
+  }
+  const mod10 = sum % 10
+  return mod10 === 0 ? mod10 : 10 - mod10
+}
+
 const FinnishBankingUtils = {
 
   /**
@@ -141,16 +156,19 @@ const FinnishBankingUtils = {
     const defaultCheckDigit = '00',
           danskeBankOffice = '800026',  //  Use a real bank and office for simplicity
           countryCodeInDigits = countryCodeToNumber('FI'),
-          localAccountNumber = danskeBankOffice + randomNumberWithLength(8)
+          bankAccount = randomNumberWithLength(7),
+          localAccountNumber = danskeBankOffice + bankAccount + luhnMod10(danskeBankOffice + bankAccount)
 
     const accountNumberCandidate = localAccountNumber +
                                    countryCodeInDigits +
                                    defaultCheckDigit
+
+    //  Luhn module 10 into account
     const checkDigit = 98 - modForLargeNumber(accountNumberCandidate, 97)
     const checkChars = checkDigit >= 10 ? ('' + checkDigit) : ('0' + checkDigit)
-
     return 'FI' + checkChars + localAccountNumber
   }
+
 }
 
 module.exports = FinnishBankingUtils
