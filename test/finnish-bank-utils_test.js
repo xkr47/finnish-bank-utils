@@ -1,5 +1,5 @@
 'use strict';
-const finnishBanking = require('../src/finnish-banking'),
+const finnishBanking = require('../src/finnish-bank-utils'),
       expect = require('chai').expect
 
 describe('finnish-banking', () => {
