@@ -105,7 +105,7 @@ describe('finnish-banking', () => {
     })
   })
 
-  describe('#generateFinnishRef', () => {
+  describe('#generateFinnishRefNumber', () => {
     it('Should create valid random reference number with a sample of 10000', () => {
       for (let i = 0; i < 10000; i++) {
         const generated = finnishBanking.generateFinnishRefNumber()
