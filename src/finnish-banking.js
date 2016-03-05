@@ -13,30 +13,38 @@ function removeLeadingZeros(str) {
   return str.replace(/^0+/, '');
 }
 
-function   countryCodeToNumber(code) {
+function countryCodeToNumber(code) {
   return "" +
          (code.charCodeAt(0) + IBAN_OFFSET_FROM_ASCIICODE) +
          (code.charCodeAt(1) + IBAN_OFFSET_FROM_ASCIICODE)
 }
 
+function randomNumberWithLength(length) {
+  let randomNumber = ''
+  for (let i = 0; i < length; i++) {
+    randomNumber += Math.floor(Math.random() * 9) + 1 //  1...9, because number can't begin with zero
+  }
+  return parseInt(randomNumber, 10)
+}
+
 /** JS number type can't handle the long account numbers... */
-function modForLargeNumber(base, divider) {
-  let div = '';
+function modForLargeNumber(base, divisor) {
+  let dividend = '';
   for (let i = 0; i < base.length; i++) {
-    div = parseInt(div + base[i], 10)
-    if (div >= divider) {
-      const mod = div % divider
+    dividend = parseInt(dividend + base[i], 10)
+    if (dividend >= divisor) {
+      const remainder = dividend % divisor
       if (i == base.length - 1) {
-        return mod
+        return remainder
       } else {
-        div = mod
+        dividend = remainder
       }
     }
   }
-  return parseInt(div, 10)
+  return parseInt(dividend, 10)
 }
 
-const FinnishBusinessUtils = {
+const FinnishBankingUtils = {
 
   /**
    * Validate parameter given finnish banking reference number.
@@ -95,17 +103,54 @@ const FinnishBusinessUtils = {
 
     accountNumber = removeAllWhiteSpaces(accountNumber);
     const localAccountNumber = accountNumber.substring(4, 18),
-        countryCode = accountNumber.substring(0, 2),
-        checksum = accountNumber.substring(2, 4)
+          countryCode = accountNumber.substring(0, 2),
+          checksum = accountNumber.substring(2, 4)
 
     return modForLargeNumber(localAccountNumber +
                              countryCodeToNumber(countryCode) +
                              checksum, 97) === 1
   },
 
-  generateReferenceNumber() {
-    return '1234561'
+  /**
+   * Returns a random reference number that is 10 chars long, including checksum char
+   * @returns {String} - For example '1776750586'
+   */
+  generateFinnishRefNumber() {
+    const refNumber = '' + randomNumberWithLength(9)
+    let checksum = 0,
+        checksumNumber
+
+    for (let i = 0; i < refNumber.length; i++) {
+      checksum += REF_NUMBER_MULTIPLIERS[i % REF_NUMBER_MULTIPLIERS.length] * parseInt(refNumber.charAt(i), 10)
+    }
+
+    checksumNumber = 10 - checksum % 10;
+    if (checksumNumber === 10) {
+      checksumNumber = 0
+    }
+    return refNumber + checksumNumber
+  },
+
+  /**
+   * Returns a semi-random valid finnish Iban bank account number
+   * https://en.wikipedia.org/wiki/International_Bank_Account_Number#Generating_IBAN_check_digits
+   * @returns {string} IBAN string, for example FI9080002627761348
+   */
+  generateFinnishIban() {
+
+    const defaultCheckDigit = '00',
+          danskeBankOffice = '800026',  //  Use a real bank and office for simplicity
+          countryCodeInDigits = countryCodeToNumber('FI'),
+          localAccountNumber = danskeBankOffice + randomNumberWithLength(8)
+
+    const accountNumberCandidate = localAccountNumber +
+                                   countryCodeInDigits +
+                                   defaultCheckDigit
+    const checkDigit = 98 - modForLargeNumber(accountNumberCandidate, 97)
+    const checkChars = checkDigit >= 10 ? ('' + checkDigit) : ('0' + checkDigit)
+
+    return 'FI' + checkChars + localAccountNumber
   }
 }
 
-module.exports = FinnishBusinessUtils
+module.exports = FinnishBankingUtils
