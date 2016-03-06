@@ -1,5 +1,5 @@
-Finnish IBAN and reference number validation and generator
-==========================================================
+Finnish IBAN and reference number validator/generator
+=====================================================
 
 [![Build Status](https://travis-ci.org/vkomulai/finnish-bank-utils.svg?branch=master)](https://travis-ci.org/vkomulai/finnish-bank-utils)
 
