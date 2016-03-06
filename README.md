@@ -24,7 +24,7 @@ Usage
 Node.js
 
 ``` js
-const FinnishBankUtils = require('finnish-bank-utills')
+const FinnishBankUtils = require('finnish-bank-utils')
 FinnishBankUtils.isValidFinnishIBAN('FI9080002627761348')
 ```
 
@@ -98,5 +98,3 @@ npm run test
 License
 -------
 [MIT License](LICENSE)
-
-
