@@ -3,6 +3,7 @@
 const REF_NUMBER_MULTIPLIERS = [1, 3, 7],
       REF_NUMBER_REGEX =  /[\d]{4,20}/,
       FINNISH_IBAN_REGEX = /^FI[\d]{16}$/,
+      GENERIC_IBAN_REGEX = /^[A-Z]{2}[\d]{16}$/,
       IBAN_OFFSET_FROM_ASCIICODE = -55
 
 function removeAllWhiteSpaces(str) {
@@ -14,15 +15,14 @@ function removeLeadingZeros(str) {
 }
 
 function countryCodeToNumber(code) {
-  return "" +
-         (code.charCodeAt(0) + IBAN_OFFSET_FROM_ASCIICODE) +
-         (code.charCodeAt(1) + IBAN_OFFSET_FROM_ASCIICODE)
+  return (code.charCodeAt(0) + IBAN_OFFSET_FROM_ASCIICODE).toString() +
+         (code.charCodeAt(1) + IBAN_OFFSET_FROM_ASCIICODE).toString()
 }
 
 function randomNumberWithLength(length) {
   let randomNumber = ''
   for (let i = 0; i < length; i++) {
-    randomNumber += Math.floor(Math.random() * 9) + 1 //  1...9, because number can't begin with zero
+    randomNumber += Math.floor(Math.random() * 9) + 1 //  1...9, because a real number can't begin with zero
   }
   return parseInt(randomNumber, 10)
 }
@@ -100,7 +100,18 @@ const FinnishBankingUtils = {
    * @returns {boolean}
    */
   isValidFinnishIBAN(accountNumber) {
-    return this.isValidIBAN(accountNumber) && accountNumber.indexOf('FI') !== -1
+    if (typeof accountNumber !== 'string' || !FINNISH_IBAN_REGEX.test(removeAllWhiteSpaces(accountNumber))) {
+      return false
+    }
+
+    accountNumber = removeAllWhiteSpaces(accountNumber)
+    const localAccountNumberWithoutCheckSum = accountNumber.substring(4, 17)
+    const luhnChecksum = parseInt(accountNumber.substring(17,18), 10)
+    if (luhnMod10(localAccountNumberWithoutCheckSum) !== luhnChecksum) {
+      return false
+    }
+
+    return this.isValidIBAN(accountNumber)
   },
 
   /**
@@ -112,11 +123,11 @@ const FinnishBankingUtils = {
    */
   isValidIBAN(accountNumber) {
     //  quick sanity check against regex, to make parsing safer later
-    if (!accountNumber || typeof accountNumber !== 'string' || !FINNISH_IBAN_REGEX.test(removeAllWhiteSpaces(accountNumber))) {
+    if (typeof accountNumber !== 'string' || !GENERIC_IBAN_REGEX.test(removeAllWhiteSpaces(accountNumber))) {
       return false
     }
 
-    accountNumber = removeAllWhiteSpaces(accountNumber);
+    accountNumber = removeAllWhiteSpaces(accountNumber)
     const localAccountNumber = accountNumber.substring(4, 18),
           countryCode = accountNumber.substring(0, 2),
           checksum = accountNumber.substring(2, 4)
@@ -131,7 +142,7 @@ const FinnishBankingUtils = {
    * @returns {String} - For example '1776750586'
    */
   generateFinnishRefNumber() {
-    const refNumber = '' + randomNumberWithLength(9)
+    const refNumber = randomNumberWithLength(9).toString()
     let checksum = 0,
         checksumNumber
 
@@ -163,9 +174,8 @@ const FinnishBankingUtils = {
                                    countryCodeInDigits +
                                    defaultCheckDigit
 
-    //  Luhn module 10 into account
     const checkDigit = 98 - modForLargeNumber(accountNumberCandidate, 97)
-    const checkChars = checkDigit >= 10 ? ('' + checkDigit) : ('0' + checkDigit)
+    const checkChars = checkDigit >= 10 ? (checkDigit.toString()) : ('0' + checkDigit)
     return 'FI' + checkChars + localAccountNumber
   }
 
