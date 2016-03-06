@@ -48,7 +48,7 @@
   }
 
   var FinnishBusinessUtils = {
-    isValidRefNumber: function isValidRefNumber(refNumber) {
+    isValidFinnishRefNumber: function isValidRefNumber(refNumber) {
       //  Sanity and format check, which allows to make safe assumptions on the format.
       if (!refNumber || typeof refNumber !== 'string' || !REF_NUMBER_REGEX.test(removeAllWhiteSpaces(refNumber))) {
         return false;

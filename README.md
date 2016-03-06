@@ -1,10 +1,10 @@
-Utilities for Finnish baking IBAN and reference numbers
-=======================================================
+Finnish IBAN and reference number validation and generator
+==========================================================
 
 [![Build Status](https://travis-ci.org/vkomulai/finnish-bank-utils.svg?branch=master)](https://travis-ci.org/vkomulai/finnish-bank-utils)
 
 - A micro Javascript library for validating and creating Finnish IBAN bank account numbers and reference numbers
-- Vanilla JS (ES6), no dependencies.
+- Vanilla JS (ES6), no dependencies
 - ES6 + Babel for browser compatibility
 
 Installation
@@ -44,42 +44,43 @@ Examples
 # Valid IBAN returns true, allows whitespace
 FinnishBankUtils.isValidFinnishIBAN('FI9080002627761348')
 FinnishBankUtils.isValidFinnishIBAN('FI 90 800026 2776 1348')
+
+# Validate any IBAN
+FinnishBankUtils.isValidIBAN('FI 90 800026 2776 1348')
 ```
 
 ```
 # Valid reference number returns true, allows whitespace
-FinnishBankUtils.isValidRefNumber('1511890656')
-FinnishBankUtils.isValidRefNumber('15118 90656')
+# !! Reference number type must be a string !!
+FinnishBankUtils.isValidFinnishRefNumber('1511890656')
+FinnishBankUtils.isValidFinnishRefNumber('15118 90656')
 ```
 
 ```
-# Generate finnish reference number
+# Generate a Finnish reference number
 FinnishBankUtils.generateFinnishRefNumber()
-// FI9080002627761348
+// '6173672848'
 ```
 
 ```
-# Generate finnish IBAN
-FinnishBankUtils.generateFinnishRefNumber()
-// 6173672848
+# Generate a Finnish IBAN
+FinnishBankUtils.generateFinnishRefIBAN()
+// 'FI9080002627761348'
 ```
 
 Functions
 ---------
 
-##### isValidRefNumber(referenceNumber) : string --> boolean
+##### isValidFinnishRefNumber(referenceNumber) : string --> boolean
 -Validates parameter given reference number
 
 ##### isValidFinnishIBAN(ibanNumber) : string --> boolean
 -Validates parameter given Finnish IBAN number
 
-##### isValidIBAN(ibanNumber) : string --> boolean
--Validates parameter given IBAN number
-
 ##### generateFinnishRefNumber() : void --> string
--Generates a random 10 char long Finnish referencenumber number
+-Generates a random 10 char long Finnish reference number
 
-##### generateFinnishIban() : void --> string
+##### generateFinnishIBAN() : void --> string
 -Generates a random Finnish IBAN number
 
 Building
@@ -94,4 +95,6 @@ npm run test
 
 License
 -------
-MIT License
+[MIT License](LICENSE)
+
+

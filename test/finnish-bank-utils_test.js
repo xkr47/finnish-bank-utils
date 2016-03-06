@@ -4,25 +4,25 @@ const finnishBanking = require('../src/finnish-bank-utils'),
 
 describe('finnish-banking', () => {
 
-  describe('#isValidRefNumber', () => {
+  describe('#isValidFinnishRefNumber', () => {
     it('Should fail when given empty String', () => {
-      expect(finnishBanking.isValidRefNumber('')).to.equal(false)
+      expect(finnishBanking.isValidFinnishRefNumber('')).to.equal(false)
     })
 
     it('Should fail when given undefined', () => {
-      expect(finnishBanking.isValidRefNumber(undefined)).to.equal(false)
+      expect(finnishBanking.isValidFinnishRefNumber(undefined)).to.equal(false)
     })
 
     it('Should fail when given null String', () => {
-      expect(finnishBanking.isValidRefNumber(null)).to.equal(false)
+      expect(finnishBanking.isValidFinnishRefNumber(null)).to.equal(false)
     })
 
     it('Should fail when given too short refnumber (3 chars)', () => {
-      expect(finnishBanking.isValidRefNumber('123')).to.equal(false)
+      expect(finnishBanking.isValidFinnishRefNumber('123')).to.equal(false)
     })
 
     it('Should fail when given too long refnumber (21 chars)', () => {
-      expect(finnishBanking.isValidRefNumber('123456789012345678901')).to.equal(false)
+      expect(finnishBanking.isValidFinnishRefNumber('123456789012345678901')).to.equal(false)
     })
 
     it('Should pass when given valid refnumbers', () => {
@@ -33,7 +33,7 @@ describe('finnish-banking', () => {
                           '01030100067175800018',
                           '3004101416423555']
       validRefs.forEach((refNumber) => {
-        expect(finnishBanking.isValidRefNumber(refNumber)).to.equal(true)
+        expect(finnishBanking.isValidFinnishRefNumber(refNumber)).to.equal(true)
       })
     })
 
@@ -45,30 +45,30 @@ describe('finnish-banking', () => {
                                   '0 10301 00067 17580 0018',
                                   '3 00410 14164 23555']
       validRefsWithSpace.forEach((refNumber) => {
-        expect(finnishBanking.isValidRefNumber(refNumber)).to.equal(true)
+        expect(finnishBanking.isValidFinnishRefNumber(refNumber)).to.equal(true)
       })
     })
   })
 
   describe('#isValidFinnishIBAN', () => {
     it('Should fail when given empty String', () => {
-      expect(finnishBanking.isValidIBAN('')).to.equal(false)
+      expect(finnishBanking.isValidFinnishIBAN('')).to.equal(false)
     })
 
     it('Should fail when given undefined', () => {
-      expect(finnishBanking.isValidIBAN(undefined)).to.equal(false)
+      expect(finnishBanking.isValidFinnishIBAN(undefined)).to.equal(false)
     })
 
     it('Should fail when given null String', () => {
-      expect(finnishBanking.isValidIBAN(null)).to.equal(false)
+      expect(finnishBanking.isValidFinnishIBAN(null)).to.equal(false)
     })
 
     it('Should fail when given non String', () => {
-      expect(finnishBanking.isValidIBAN({})).to.equal(false)
-      expect(finnishBanking.isValidIBAN(Date())).to.equal(false)
-      expect(finnishBanking.isValidIBAN(3)).to.equal(false)
-      expect(finnishBanking.isValidIBAN(['a'])).to.equal(false)
-      expect(finnishBanking.isValidIBAN(NaN)).to.equal(false)
+      expect(finnishBanking.isValidFinnishIBAN({})).to.equal(false)
+      expect(finnishBanking.isValidFinnishIBAN(Date())).to.equal(false)
+      expect(finnishBanking.isValidFinnishIBAN(3)).to.equal(false)
+      expect(finnishBanking.isValidFinnishIBAN(['a'])).to.equal(false)
+      expect(finnishBanking.isValidFinnishIBAN(NaN)).to.equal(false)
     })
 
     it('Should fail when given almost valid bank number with nonsense in the end', () => {
@@ -109,15 +109,15 @@ describe('finnish-banking', () => {
     it('Should create valid random reference number with a sample of 10000', () => {
       for (let i = 0; i < 10000; i++) {
         const generated = finnishBanking.generateFinnishRefNumber()
-        expect(finnishBanking.isValidRefNumber(generated)).to.equal(true)
+        expect(finnishBanking.isValidFinnishRefNumber(generated)).to.equal(true)
       }
     })
   })
 
-  describe('#generateFinnishIban', () => {
+  describe('#generateFinnishIBAN', () => {
     it('Should create valid finnish IBAN number with a sample of 10000', () => {
       for (let i = 0; i < 10000; i++) {
-        const generated = finnishBanking.generateFinnishIban()
+        const generated = finnishBanking.generateFinnishIBAN()
         expect(finnishBanking.isValidFinnishIBAN(generated)).to.equal(true)
       }
     })

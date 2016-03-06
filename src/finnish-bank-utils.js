@@ -3,15 +3,14 @@
 const REF_NUMBER_MULTIPLIERS = [1, 3, 7],
       REF_NUMBER_REGEX =  /[\d]{4,20}/,
       FINNISH_IBAN_REGEX = /^FI[\d]{16}$/,
-      GENERIC_IBAN_REGEX = /^[A-Z]{2}[\d]{16}$/,
       IBAN_OFFSET_FROM_ASCIICODE = -55
 
 function removeAllWhiteSpaces(str) {
-  return str.replace(/\s+/g, '');
+  return str.replace(/\s+/g, '')
 }
 
 function removeLeadingZeros(str) {
-  return str.replace(/^0+/, '');
+  return str.replace(/^0+/, '')
 }
 
 function countryCodeToNumber(code) {
@@ -44,7 +43,7 @@ function modForLargeNumber(base, divisor) {
   return parseInt(dividend, 10)
 }
 
-/** Luhn mod 10 algorithm https://en.wikipedia.org/wiki/Luhn_algorithm */
+/** Luhn mod 10 checksum algorithm https://en.wikipedia.org/wiki/Luhn_algorithm */
 function luhnMod10(value) {
   let sum = 0
   for (let i = 0; i < value.length; i++) {
@@ -59,6 +58,25 @@ function luhnMod10(value) {
   return mod10 === 0 ? mod10 : 10 - mod10
 }
 
+function isValidFinnishBBAN(accountNumber) {
+  accountNumber = removeAllWhiteSpaces(accountNumber)
+  const localAccountNumberWithoutCheckSum = accountNumber.substring(4, 17),
+        luhnChecksumChar = parseInt(accountNumber.substring(17,18), 10)
+
+  return luhnMod10(localAccountNumberWithoutCheckSum) === luhnChecksumChar
+}
+
+function isValidIBAN(accountNumber) {
+  accountNumber = removeAllWhiteSpaces(accountNumber)
+  const localAccountNumber = accountNumber.substring(4, 18),
+        countryCode = accountNumber.substring(0, 2),
+        checksum = accountNumber.substring(2, 4)
+
+  return modForLargeNumber(localAccountNumber +
+                           countryCodeToNumber(countryCode) +
+                           checksum, 97) === 1
+}
+
 const FinnishBankingUtils = {
 
   /**
@@ -67,7 +85,7 @@ const FinnishBankingUtils = {
    * @param refNumber - {String} Reference number to parse, for example: 1234 56789 123123
    * @returns {boolean}
    */
-  isValidRefNumber(refNumber) {
+  isValidFinnishRefNumber(refNumber) {
     //  Sanity and format check, which allows to make safe assumptions on the format.
     if (!refNumber || typeof refNumber !== 'string' || !REF_NUMBER_REGEX.test(removeAllWhiteSpaces(refNumber))) {
       return false
@@ -83,7 +101,6 @@ const FinnishBankingUtils = {
     for (let i = 0; i < refNumberLengthNoChecksum; i++) {
       checksum += REF_NUMBER_MULTIPLIERS[i % REF_NUMBER_MULTIPLIERS.length] * parseInt(refNumber.charAt(i), 10)
     }
-
     checksumNumber = 10 - checksum % 10;
 
     if (checksumNumber === 10) {
@@ -94,7 +111,6 @@ const FinnishBankingUtils = {
 
   /**
    * Validate finnish IBAN. Allows grouping of numbers with whitespace.
-   * https://fi.wikipedia.org/wiki/IBAN
    *
    * @param accountNumber - {String} Account number to validate: FI 90 800026 2776 1348
    * @returns {boolean}
@@ -104,38 +120,9 @@ const FinnishBankingUtils = {
       return false
     }
 
-    accountNumber = removeAllWhiteSpaces(accountNumber)
-    const localAccountNumberWithoutCheckSum = accountNumber.substring(4, 17)
-    const luhnChecksum = parseInt(accountNumber.substring(17,18), 10)
-    if (luhnMod10(localAccountNumberWithoutCheckSum) !== luhnChecksum) {
-      return false
-    }
-
-    return this.isValidIBAN(accountNumber)
+    return isValidFinnishBBAN(accountNumber) && isValidIBAN(accountNumber)
   },
 
-  /**
-   * Validate international IBAN. Allows grouping of numbers with whitespace.
-   * https://fi.wikipedia.org/wiki/IBAN
-   *
-   * @param accountNumber - {String} Account number to validate: FI 90 800026 2776 1348
-   * @returns {boolean}
-   */
-  isValidIBAN(accountNumber) {
-    //  quick sanity check against regex, to make parsing safer later
-    if (typeof accountNumber !== 'string' || !GENERIC_IBAN_REGEX.test(removeAllWhiteSpaces(accountNumber))) {
-      return false
-    }
-
-    accountNumber = removeAllWhiteSpaces(accountNumber)
-    const localAccountNumber = accountNumber.substring(4, 18),
-          countryCode = accountNumber.substring(0, 2),
-          checksum = accountNumber.substring(2, 4)
-
-    return modForLargeNumber(localAccountNumber +
-                             countryCodeToNumber(countryCode) +
-                             checksum, 97) === 1
-  },
 
   /**
    * Returns a random reference number that is 10 chars long, including checksum char
@@ -162,7 +149,7 @@ const FinnishBankingUtils = {
    * https://en.wikipedia.org/wiki/International_Bank_Account_Number#Generating_IBAN_check_digits
    * @returns {string} IBAN string, for example FI9080002627761348
    */
-  generateFinnishIban() {
+  generateFinnishIBAN() {
 
     const defaultCheckDigit = '00',
           danskeBankOffice = '800026',  //  Use a real bank and office for simplicity
