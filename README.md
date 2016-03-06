@@ -87,12 +87,13 @@ Functions
 Building
 --------
 
-````
+```sh
 # Build a distributable, minified UMD library compatible with browsers and Node
 npm run dist
+
 # Run tests
 npm run test
-````
+```
 
 License
 -------
