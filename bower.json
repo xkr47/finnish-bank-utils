@@ -1,0 +1,27 @@
+{
+  "name": "finnish-bank-utils",
+  "main": "./dist/finnish-bank-utils.min.js",
+  "version": "1.0.0",
+  "authors": [
+    "vkomulai <ville.komulainen@iki.fi>"
+  ],
+  "description": "A micro Javascript library for validating and creating Finnish IBAN bank account numbers and reference numbers",
+  "moduleType": [
+    "globals",
+    "node"
+  ],
+  "keywords": [
+    "Finnish",
+    "IBAN",
+    "Validation"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/vkomulai/finnish-bank-utils",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
