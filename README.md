@@ -45,9 +45,6 @@ Examples
 # Valid IBAN returns true, allows whitespace
 FinnishBankUtils.isValidFinnishIBAN('FI9080002627761348')
 FinnishBankUtils.isValidFinnishIBAN('FI 90 800026 2776 1348')
-
-# Validate any IBAN
-FinnishBankUtils.isValidIBAN('FI 90 800026 2776 1348')
 ```
 
 ```sh
