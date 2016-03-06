@@ -13,6 +13,7 @@ Installation
 ```sh
 # NPM
 npm install finnish-bank-utils
+
 # Bower
 bower install finnish-bank-utils
 ```
@@ -40,7 +41,7 @@ Browser: Writes FinnishBankUtils into global namespace.
 Examples
 --------
 
-```
+```sh
 # Valid IBAN returns true, allows whitespace
 FinnishBankUtils.isValidFinnishIBAN('FI9080002627761348')
 FinnishBankUtils.isValidFinnishIBAN('FI 90 800026 2776 1348')
@@ -49,20 +50,20 @@ FinnishBankUtils.isValidFinnishIBAN('FI 90 800026 2776 1348')
 FinnishBankUtils.isValidIBAN('FI 90 800026 2776 1348')
 ```
 
-```
+```sh
 # Valid reference number returns true, allows whitespace
 # !! Reference number type must be a string !!
 FinnishBankUtils.isValidFinnishRefNumber('1511890656')
 FinnishBankUtils.isValidFinnishRefNumber('15118 90656')
 ```
 
-```
+```sh
 # Generate a Finnish reference number
 FinnishBankUtils.generateFinnishRefNumber()
 // '6173672848'
 ```
 
-```
+```sh
 # Generate a Finnish IBAN
 FinnishBankUtils.generateFinnishRefIBAN()
 // 'FI9080002627761348'
