@@ -1,7 +1,7 @@
 Finnish IBAN and reference number validator/generator
 =====================================================
 
-[![Build Status](https://travis-ci.org/vkomulai/finnish-bank-utils.svg?branch=master)](https://travis-ci.org/vkomulai/finnish-bank-utils)
+[![Build Status](https://travis-ci.org/vkomulai/finnish-bank-utils.svg?branch=master)](https://travis-ci.org/vkomulai/finnish-bank-utils) ![0 deps](https://david-dm.org/vkomulai/finnish-bank-utils.svg)
 
 - A micro Javascript library for validating and creating Finnish IBAN bank account numbers and reference numbers
 - Lightweight, 3.8kB

@@ -12,7 +12,13 @@
     "type": "git",
     "url": "https://github.com/vkomulai/finnish-bank-utils.git"
   },
-  "keywords": [],
+  "keywords": [
+    "Finnish",
+    "IBAN",
+    "Validation",
+    "Viitenumero",
+    "Reference number"
+  ],
   "author": "vkomulai <ville.komulainen@iki.fi>",
   "license": "MIT",
   "bugs": {

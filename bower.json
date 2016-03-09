@@ -13,7 +13,9 @@
   "keywords": [
     "Finnish",
     "IBAN",
-    "Validation"
+    "Validation",
+    "Viitenumero",
+    "Reference number"
   ],
   "license": "MIT",
   "homepage": "https://github.com/vkomulai/finnish-bank-utils",
