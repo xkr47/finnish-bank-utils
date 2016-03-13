@@ -1,6 +1,6 @@
 {
   "name": "finnish-bank-utils",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "./dist/finnish-bank-utils.js",
   "description": "A micro Javascript library for validating and creating Finnish IBAN bank account numbers and reference numbers",
   "scripts": {
@@ -14,9 +14,11 @@
   },
   "keywords": [
     "Finnish",
+    "Suomalainen",
     "IBAN",
     "Validation",
     "Viitenumero",
+    "Tilinumero",
     "Reference number"
   ],
   "author": "vkomulai <ville.komulainen@iki.fi>",
