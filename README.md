@@ -53,6 +53,7 @@ FinnishBankUtils.isValidFinnishIBAN('FI 90 800026 2776 1348')
 # !! Reference number type must be a string !!
 FinnishBankUtils.isValidFinnishRefNumber('1511890656')
 FinnishBankUtils.isValidFinnishRefNumber('15118 90656')
+FinnishBankUtils.isValidFinnishRefNumber('RF34 1234 561')
 ```
 
 ```sh

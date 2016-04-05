@@ -40,7 +40,8 @@ describe('finnish-bank-utils', () => {
         '01030100067175800018',
         'RF031030100067175800018',
         '3004101416423555',
-        'RF847758474790647489'
+        '77584747906474893225',
+        'RF7677584747906474893225'
       ]
       validRefs.forEach(refNumber =>
         expect(FinnishBankUtils.isValidFinnishRefNumber(refNumber)).to.equal(true)
@@ -58,7 +59,8 @@ describe('finnish-bank-utils', () => {
         '0 10301 00067 17580 0018',
         'RF03 1030 1000 6717 5800 018',
         '3 00410 14164 23555',
-        'RF84 7758 4747 9064 7489'
+        '77584 74790 64748 93225',
+        'RF76 7758 4747 9064 7489 3225'
       ]
       validRefsWithSpace.forEach(refNumber =>
         expect(FinnishBankUtils.isValidFinnishRefNumber(refNumber)).to.equal(true)
