@@ -22,6 +22,10 @@ function lettersToNumbers(str) {
   }).join('')
 }
 
+function reverseString(str) {
+  return [...str].reverse().join('')
+}
+
 function randomNumberWithLength(length) {
   let randomNumber = ''
   for (let i = 0; i < length; i++) {
@@ -72,7 +76,7 @@ function isValidFinnishBBAN(accountNumber) {
 }
 
 function isValidIBAN(iban) {
-  iban = removeAllWhiteSpaces(iban)
+  iban = removeAllWhiteSpaces(iban.toUpperCase())
   const
     prefixAndChecksum = iban.substr(0, 4),
     number = iban.substr(4)
@@ -90,11 +94,11 @@ const FinnishBankUtils = {
    */
   isValidFinnishRefNumber(refNumber) {
     //  Sanity and format check, which allows to make safe assumptions on the format.
-    if (!refNumber || typeof refNumber !== 'string' || !REF_NUMBER_REGEX.test(removeAllWhiteSpaces(refNumber))) {
+    if (!refNumber || typeof refNumber !== 'string' || !REF_NUMBER_REGEX.test(removeAllWhiteSpaces(refNumber.toUpperCase()))) {
       return false
     }
 
-    refNumber = removeAllWhiteSpaces(refNumber)
+    refNumber = removeAllWhiteSpaces(refNumber.toUpperCase())
 
     if (/^RF/.test(refNumber)) {
       if (!isValidIBAN(refNumber)) {
@@ -127,13 +131,46 @@ const FinnishBankUtils = {
    * @returns {boolean}
    */
   isValidFinnishIBAN(accountNumber) {
-    if (typeof accountNumber !== 'string' || !FINNISH_IBAN_REGEX.test(removeAllWhiteSpaces(accountNumber))) {
+    if (typeof accountNumber !== 'string' || !FINNISH_IBAN_REGEX.test(removeAllWhiteSpaces(accountNumber.toUpperCase()))) {
       return false
     }
 
     return isValidFinnishBBAN(accountNumber) && isValidIBAN(accountNumber)
   },
 
+  /**
+   * Format finnish reference number. Adds whitespace every 5 or 4 characters
+   *
+   * @param refNumber - {String} Reference number to format: RF341234561
+   * @param separator - {String} Whitespace or other string to be used
+   * @returns {string|undefined}
+   */
+  formatFinnishRefNumber(refNumber, separator = ' ') {
+    if (this.isValidFinnishRefNumber(refNumber)) {
+      refNumber = removeAllWhiteSpaces(refNumber.toUpperCase())
+      if (/^RF/.test(refNumber)) {
+        refNumber = refNumber.substr(0, 4) + removeLeadingZeros(refNumber.substr(4))
+        return refNumber.replace(/.{4}/g, '$&' + separator).trim()
+      } else {
+        refNumber = removeLeadingZeros(refNumber)
+        return reverseString(reverseString(refNumber).replace(/.{5}/g, '$&' + separator).trim())
+      }
+    }
+  },
+
+  /**
+   * Format finnish IBAN. Adds whitespace every 4 characters
+   *
+   * @param accountNumber - {String} Account number to format: FI9080002627761348
+   * @param separator - {String} Whitespace or other string to be used
+   * @returns {string|undefined}
+   */
+  formatFinnishIBAN(accountNumber, separator = ' ') {
+    if (this.isValidFinnishIBAN(accountNumber)) {
+      accountNumber = removeAllWhiteSpaces(accountNumber.toUpperCase())
+      return accountNumber.replace(/.{4}/g, '$&' + separator).trim()
+    }
+  },
 
   /**
    * Returns a random reference number that is 10 chars long, including checksum char
