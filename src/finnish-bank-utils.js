@@ -26,6 +26,13 @@ function reverseString(str) {
   return [...str].reverse().join('')
 }
 
+function removeStringFromEnd(str, strToRemove) {
+  if (str.substr(-strToRemove.length) === strToRemove) {
+    return str.substr(0, str.length - strToRemove.length)
+  }
+  return str
+}
+
 function randomNumberWithLength(length) {
   let randomNumber = ''
   for (let i = 0; i < length; i++) {
@@ -150,10 +157,10 @@ const FinnishBankUtils = {
       refNumber = removeAllWhiteSpaces(refNumber.toUpperCase())
       if (/^RF/.test(refNumber)) {
         refNumber = refNumber.substr(0, 4) + removeLeadingZeros(refNumber.substr(4))
-        return refNumber.replace(/.{4}/g, '$&' + separator).trim()
+        return removeStringFromEnd(refNumber.replace(/.{4}/g, '$&' + separator), separator)
       } else {
         refNumber = removeLeadingZeros(refNumber)
-        return reverseString(reverseString(refNumber).replace(/.{5}/g, '$&' + separator).trim())
+        return reverseString(removeStringFromEnd(reverseString(refNumber).replace(/.{5}/g, '$&' + separator), separator))
       }
     }
   },
@@ -168,7 +175,7 @@ const FinnishBankUtils = {
   formatFinnishIBAN(accountNumber, separator = ' ') {
     if (this.isValidFinnishIBAN(accountNumber)) {
       accountNumber = removeAllWhiteSpaces(accountNumber.toUpperCase())
-      return accountNumber.replace(/.{4}/g, '$&' + separator).trim()
+      return removeStringFromEnd(accountNumber.replace(/.{4}/g, '$&' + separator), separator)
     }
   },
 

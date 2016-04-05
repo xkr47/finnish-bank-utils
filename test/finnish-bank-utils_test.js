@@ -174,6 +174,11 @@ describe('finnish-bank-utils', () => {
       )
     })
 
+    it('Should format with custom separator', () => {
+      expect(FinnishBankUtils.formatFinnishRefNumber('RF7677584747906474893225', '.')).to.equal('RF76.7758.4747.9064.7489.3225')
+      expect(FinnishBankUtils.formatFinnishRefNumber('77584747906474893225', '.')).to.equal('77584.74790.64748.93225')
+    })
+
   })
 
   describe('#formatFinnishIBAN', () => {
@@ -224,14 +229,8 @@ describe('finnish-bank-utils', () => {
       )
     })
 
-    it('Should pass when given valid bank numbers with whitespace separators', () => {
-      const validIBANs = [
-        'FI 90 800026 2776 1348',
-        'FI90 800026 27761348'
-      ]
-      validIBANs.forEach(iban =>
-        expect(FinnishBankUtils.isValidFinnishIBAN(iban)).to.equal(true)
-      )
+    it('Should format with custom separator', () => {
+      expect(FinnishBankUtils.formatFinnishIBAN('FI7839390014047815', '.')).to.equal('FI78.3939.0014.0478.15')
     })
   })
 
