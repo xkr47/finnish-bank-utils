@@ -47,6 +47,17 @@
     }).join('');
   }
 
+  function reverseString(str) {
+    return [].concat(_toConsumableArray(str)).reverse().join('');
+  }
+
+  function removeStringFromEnd(str, strToRemove) {
+    if (str.substr(-strToRemove.length) === strToRemove) {
+      return str.substr(0, str.length - strToRemove.length);
+    }
+    return str;
+  }
+
   function randomNumberWithLength(length) {
     var randomNumber = '';
     for (var i = 0; i < length; i++) {
@@ -96,7 +107,7 @@
   }
 
   function isValidIBAN(iban) {
-    iban = removeAllWhiteSpaces(iban);
+    iban = removeAllWhiteSpaces(iban.toUpperCase());
     var prefixAndChecksum = iban.substr(0, 4),
         number = iban.substr(4);
 
@@ -106,11 +117,11 @@
   var FinnishBankUtils = {
     isValidFinnishRefNumber: function isValidFinnishRefNumber(refNumber) {
       //  Sanity and format check, which allows to make safe assumptions on the format.
-      if (!refNumber || typeof refNumber !== 'string' || !REF_NUMBER_REGEX.test(removeAllWhiteSpaces(refNumber))) {
+      if (!refNumber || typeof refNumber !== 'string' || !REF_NUMBER_REGEX.test(removeAllWhiteSpaces(refNumber.toUpperCase()))) {
         return false;
       }
 
-      refNumber = removeAllWhiteSpaces(refNumber);
+      refNumber = removeAllWhiteSpaces(refNumber.toUpperCase());
 
       if (/^RF/.test(refNumber)) {
         if (!isValidIBAN(refNumber)) {
@@ -136,11 +147,33 @@
       return checksumNumber === parseInt(refNumber.charAt(refNumberLengthNoChecksum));
     },
     isValidFinnishIBAN: function isValidFinnishIBAN(accountNumber) {
-      if (typeof accountNumber !== 'string' || !FINNISH_IBAN_REGEX.test(removeAllWhiteSpaces(accountNumber))) {
+      if (typeof accountNumber !== 'string' || !FINNISH_IBAN_REGEX.test(removeAllWhiteSpaces(accountNumber.toUpperCase()))) {
         return false;
       }
 
       return isValidFinnishBBAN(accountNumber) && isValidIBAN(accountNumber);
+    },
+    formatFinnishRefNumber: function formatFinnishRefNumber(refNumber) {
+      var separator = arguments.length <= 1 || arguments[1] === undefined ? ' ' : arguments[1];
+
+      if (this.isValidFinnishRefNumber(refNumber)) {
+        refNumber = removeAllWhiteSpaces(refNumber.toUpperCase());
+        if (/^RF/.test(refNumber)) {
+          refNumber = refNumber.substr(0, 4) + removeLeadingZeros(refNumber.substr(4));
+          return removeStringFromEnd(refNumber.replace(/.{4}/g, '$&' + separator), separator);
+        } else {
+          refNumber = removeLeadingZeros(refNumber);
+          return reverseString(removeStringFromEnd(reverseString(refNumber).replace(/.{5}/g, '$&' + separator), separator));
+        }
+      }
+    },
+    formatFinnishIBAN: function formatFinnishIBAN(accountNumber) {
+      var separator = arguments.length <= 1 || arguments[1] === undefined ? ' ' : arguments[1];
+
+      if (this.isValidFinnishIBAN(accountNumber)) {
+        accountNumber = removeAllWhiteSpaces(accountNumber.toUpperCase());
+        return removeStringFromEnd(accountNumber.replace(/.{4}/g, '$&' + separator), separator);
+      }
     },
     generateFinnishRefNumber: function generateFinnishRefNumber() {
       var refNumber = randomNumberWithLength(9).toString();

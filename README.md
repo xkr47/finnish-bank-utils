@@ -1,10 +1,7 @@
-Finnish IBAN and reference number validator/generator
-=====================================================
+[![Build Status](https://travis-ci.org/vkomulai/finnish-bank-utils.svg?branch=master)](https://travis-ci.org/vkomulai/finnish-bank-utils) ![0 deps](https://david-dm.org/vkomulai/finnish-bank-utils.svg) ![Downloads](https://img.shields.io/npm/dt/finnish-bank-utils.svg) ![License](https://img.shields.io/npm/l/finnish-bank-utils.svg)
 
-[![Build Status](https://travis-ci.org/vkomulai/finnish-bank-utils.svg?branch=master)](https://travis-ci.org/vkomulai/finnish-bank-utils) ![0 deps](https://david-dm.org/vkomulai/finnish-bank-utils.svg)
-
-- A micro Javascript library for validating and creating Finnish IBAN bank account numbers and reference numbers
-- Lightweight, 3.8kB
+- A micro Javascript library for validating, creating and formatting Finnish IBAN bank account numbers and reference numbers
+- Lightweight, 5.2kB
 - No dependencies
 - Vanilla JS (ES6) + Babel for browser compatibility
 
@@ -52,6 +49,8 @@ FinnishBankUtils.isValidFinnishIBAN('FI 90 800026 2776 1348')
 # !! Reference number type must be a string !!
 FinnishBankUtils.isValidFinnishRefNumber('1511890656')
 FinnishBankUtils.isValidFinnishRefNumber('15118 90656')
+
+# Allow international format for local reference number
 FinnishBankUtils.isValidFinnishRefNumber('RF34 1234 561')
 ```
 

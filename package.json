@@ -1,8 +1,8 @@
 {
   "name": "finnish-bank-utils",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "main": "./dist/finnish-bank-utils.js",
-  "description": "A micro Javascript library for validating and creating Finnish IBAN bank account numbers and reference numbers",
+  "description": "A micro Javascript library for validating, creating and formatting Finnish IBAN bank account numbers and reference numbers",
   "scripts": {
     "dist": "./node_modules/.bin/babel src/finnish-bank-utils.js > dist/finnish-bank-utils.js && ./node_modules/.bin/uglifyjs dist/finnish-bank-utils.js > dist/finnish-bank-utils.min.js",
     "lint": "./node_modules/.bin/eslint src/*.js test/*.js",
