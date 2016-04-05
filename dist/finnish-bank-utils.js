@@ -13,9 +13,21 @@
 })(this, function (module) {
   'use strict';
 
+  function _toConsumableArray(arr) {
+    if (Array.isArray(arr)) {
+      for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) {
+        arr2[i] = arr[i];
+      }
+
+      return arr2;
+    } else {
+      return Array.from(arr);
+    }
+  }
+
   var REF_NUMBER_MULTIPLIERS = [1, 3, 7],
-      REF_NUMBER_REGEX = /[\d]{4,20}/,
-      FINNISH_IBAN_REGEX = /^FI[\d]{16}$/,
+      REF_NUMBER_REGEX = /^(\d{4,20}|RF\d{6,23})$/i,
+      FINNISH_IBAN_REGEX = /^FI\d{16}$/,
       IBAN_OFFSET_FROM_ASCIICODE = -55;
 
   function removeAllWhiteSpaces(str) {
@@ -26,8 +38,13 @@
     return str.replace(/^0+/, '');
   }
 
-  function countryCodeToNumber(code) {
-    return (code.charCodeAt(0) + IBAN_OFFSET_FROM_ASCIICODE).toString() + (code.charCodeAt(1) + IBAN_OFFSET_FROM_ASCIICODE).toString();
+  function lettersToNumbers(string) {
+    return [].concat(_toConsumableArray(string)).map(function (char) {
+      if (/\D/.test(char)) {
+        return String(char.charCodeAt(0) + IBAN_OFFSET_FROM_ASCIICODE);
+      }
+      return char;
+    }).join('');
   }
 
   function randomNumberWithLength(length) {
@@ -72,22 +89,21 @@
 
   function isValidFinnishBBAN(accountNumber) {
     accountNumber = removeAllWhiteSpaces(accountNumber);
-    var localAccountNumberWithoutCheckSum = accountNumber.substring(4, 17),
-        luhnChecksumChar = parseInt(accountNumber.substring(17, 18), 10);
+    var localAccountNumberWithoutCheckSum = accountNumber.substr(4, 13),
+        luhnChecksumChar = parseInt(accountNumber.substr(17, 1), 10);
 
     return luhnMod10(localAccountNumberWithoutCheckSum) === luhnChecksumChar;
   }
 
   function isValidIBAN(accountNumber) {
     accountNumber = removeAllWhiteSpaces(accountNumber);
-    var localAccountNumber = accountNumber.substring(4, 18),
-        countryCode = accountNumber.substring(0, 2),
-        checksum = accountNumber.substring(2, 4);
+    var countryCodeAndChecksum = accountNumber.substr(0, 4),
+        localAccountNumber = accountNumber.substr(4, 14);
 
-    return modForLargeNumber(localAccountNumber + countryCodeToNumber(countryCode) + checksum, 97) === 1;
+    return modForLargeNumber(lettersToNumbers(localAccountNumber + countryCodeAndChecksum), 97) === 1;
   }
 
-  var FinnishBankingUtils = {
+  var FinnishBankUtils = {
     isValidFinnishRefNumber: function isValidFinnishRefNumber(refNumber) {
       //  Sanity and format check, which allows to make safe assumptions on the format.
       if (!refNumber || typeof refNumber !== 'string' || !REF_NUMBER_REGEX.test(removeAllWhiteSpaces(refNumber))) {
@@ -95,11 +111,19 @@
       }
 
       refNumber = removeAllWhiteSpaces(refNumber);
+
+      if (/^RF/.test(refNumber)) {
+        if (!isValidIBAN(refNumber)) {
+          return false;
+        }
+        refNumber = refNumber.substr(4);
+      }
+
       refNumber = removeLeadingZeros(refNumber);
 
       var checksum = 0,
           refNumberLengthNoChecksum = refNumber.length - 1,
-          checksumNumber = undefined;
+          checksumNumber = void 0;
 
       for (var i = 0; i < refNumberLengthNoChecksum; i++) {
         checksum += REF_NUMBER_MULTIPLIERS[i % REF_NUMBER_MULTIPLIERS.length] * parseInt(refNumber.charAt(i), 10);
@@ -121,7 +145,7 @@
     generateFinnishRefNumber: function generateFinnishRefNumber() {
       var refNumber = randomNumberWithLength(9).toString();
       var checksum = 0,
-          checksumNumber = undefined;
+          checksumNumber = void 0;
 
       for (var i = 0; i < refNumber.length; i++) {
         checksum += REF_NUMBER_MULTIPLIERS[i % REF_NUMBER_MULTIPLIERS.length] * parseInt(refNumber.charAt(i), 10);
@@ -138,7 +162,7 @@
       var defaultCheckDigit = '00',
           danskeBankOffice = '800026',
           //  Use a real bank and office for simplicity
-      countryCodeInDigits = countryCodeToNumber('FI'),
+      countryCodeInDigits = lettersToNumbers('FI'),
           bankAccount = randomNumberWithLength(7),
           localAccountNumber = danskeBankOffice + bankAccount + luhnMod10(danskeBankOffice + bankAccount);
 
@@ -150,6 +174,6 @@
     }
   };
 
-  module.exports = FinnishBankingUtils;
+  module.exports = FinnishBankUtils;
 });
 

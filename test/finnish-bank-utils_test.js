@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 const finnishBanking = require('../src/finnish-bank-utils'),
       expect = require('chai').expect
 
@@ -17,40 +17,52 @@ describe('finnish-banking', () => {
       expect(finnishBanking.isValidFinnishRefNumber(null)).to.equal(false)
     })
 
-    it('Should fail when given too short refnumber (2 chars)', () => {
-      expect(finnishBanking.isValidFinnishRefNumber('12')).to.equal(false)
+    it('Should fail when given too short refnumber (3 or 7 chars)', () => {
+      expect(finnishBanking.isValidFinnishRefNumber('123')).to.equal(false)
+      expect(finnishBanking.isValidFinnishRefNumber('RF12345')).to.equal(false)
     })
 
-    it('Should fail when given too long refnumber (21 chars)', () => {
+    it('Should fail when given too long refnumber (21 or 26 chars)', () => {
       expect(finnishBanking.isValidFinnishRefNumber('123456789012345678901')).to.equal(false)
+      expect(finnishBanking.isValidFinnishRefNumber('RF123456789012345678901234')).to.equal(false)
     })
 
     it('Should pass when given valid refnumbers', () => {
       const validRefs = [
-        '123',
         '1234561',
+        'RF341234561',
         '1511890656',
+        'RF601511890656',
         '3222190631525115',
         '1231180652526617',
         '01030100067175800018',
-        '3004101416423555'
+        '3004101416423555',
       ]
-      validRefs.forEach((refNumber) => {
+      validRefs.forEach(refNumber =>
         expect(finnishBanking.isValidFinnishRefNumber(refNumber)).to.equal(true)
-      })
+      )
     })
 
     it('Should pass when given valid refnumbers with whitespaces', () => {
-      const validRefsWithSpace = ['123456 1',
-                                  '15118 90656',
-                                  '3 22219 06315 25115',
-                                  '1 23118 06525 26617',
-                                  '0 10301 00067 17580 0018',
-                                  '3 00410 14164 23555']
-      validRefsWithSpace.forEach((refNumber) => {
+      const validRefsWithSpace = [
+        ' 123456 1 ',
+        'RF34 1234 561',
+        '15118 90656',
+        'RF60 1511 8906 56',
+        '3 22219 06315 25115',
+        '1 23118 06525 26617',
+        '0 10301 00067 17580 0018',
+        '3 00410 14164 23555'
+      ]
+      validRefsWithSpace.forEach(refNumber =>
         expect(finnishBanking.isValidFinnishRefNumber(refNumber)).to.equal(true)
-      })
+      )
     })
+
+    it('Should fail when given valid non finnish refnumber in international format', () => {
+      expect(finnishBanking.isValidFinnishRefNumber('RF97C2H5OH')).to.equal(false)
+    })
+
   })
 
   describe('#isValidFinnishIBAN', () => {
@@ -83,28 +95,32 @@ describe('finnish-banking', () => {
     })
 
     it('Should pass when given valid bank number', () => {
-      const validIBANs = ['FI9080002627761348',
-                        'FI2680003710241081',
-                        'FI2580003710241099',
-                        'FI4880003710241073',
-                        'FI0280003710211928',
-                        'FI3039390038674263',
-                        'FI7839390014047815',
-                        'FI2839390030337828',
-                        'FI7118203000008391',
-                        'FI5415713000030016',
-                        'FI0218803500006967']
-      validIBANs.forEach((iban) => {
+      const validIBANs = [
+        'FI9080002627761348',
+        'FI2680003710241081',
+        'FI2580003710241099',
+        'FI4880003710241073',
+        'FI0280003710211928',
+        'FI3039390038674263',
+        'FI7839390014047815',
+        'FI2839390030337828',
+        'FI7118203000008391',
+        'FI5415713000030016',
+        'FI0218803500006967'
+      ]
+      validIBANs.forEach(iban =>
         expect(finnishBanking.isValidFinnishIBAN(iban)).to.equal(true)
-      })
+      )
     })
 
     it('Should pass when given valid bank numbers with whitespace separators', () => {
-      const validIBANs = ['FI 90 800026 2776 1348',
-                        'FI90 800026 27761348']
-      validIBANs.forEach((iban) => {
+      const validIBANs = [
+        'FI 90 800026 2776 1348',
+        'FI90 800026 27761348'
+      ]
+      validIBANs.forEach(iban =>
         expect(finnishBanking.isValidFinnishIBAN(iban)).to.equal(true)
-      })
+      )
     })
   })
 

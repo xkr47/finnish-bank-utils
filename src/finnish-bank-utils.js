@@ -1,7 +1,7 @@
 'use strict'
 
 const REF_NUMBER_MULTIPLIERS = [1, 3, 7],
-      REF_NUMBER_REGEX =  /\d{3,20}/,
+      REF_NUMBER_REGEX =  /^(\d{4,20}|RF\d{6,23})$/i,
       FINNISH_IBAN_REGEX = /^FI\d{16}$/,
       IBAN_OFFSET_FROM_ASCIICODE = -55
 
@@ -13,9 +13,13 @@ function removeLeadingZeros(str) {
   return str.replace(/^0+/, '')
 }
 
-function countryCodeToNumber(code) {
-  return (code.charCodeAt(0) + IBAN_OFFSET_FROM_ASCIICODE).toString() +
-         (code.charCodeAt(1) + IBAN_OFFSET_FROM_ASCIICODE).toString()
+function lettersToNumbers(string) {
+  return [...string].map(char => {
+    if (/\D/.test(char)) {
+      return String(char.charCodeAt(0) + IBAN_OFFSET_FROM_ASCIICODE)
+    }
+    return char
+  }).join('')
 }
 
 function randomNumberWithLength(length) {
@@ -28,7 +32,7 @@ function randomNumberWithLength(length) {
 
 /** JS number type can't handle the long account numbers... */
 function modForLargeNumber(base, divisor) {
-  let dividend = '';
+  let dividend = ''
   for (let i = 0; i < base.length; i++) {
     dividend = parseInt(dividend + base[i], 10)
     if (dividend >= divisor) {
@@ -60,21 +64,20 @@ function luhnMod10(value) {
 
 function isValidFinnishBBAN(accountNumber) {
   accountNumber = removeAllWhiteSpaces(accountNumber)
-  const localAccountNumberWithoutCheckSum = accountNumber.substring(4, 17),
-        luhnChecksumChar = parseInt(accountNumber.substring(17,18), 10)
+  const
+    localAccountNumberWithoutCheckSum = accountNumber.substr(4, 13),
+    luhnChecksumChar = parseInt(accountNumber.substr(17, 1), 10)
 
   return luhnMod10(localAccountNumberWithoutCheckSum) === luhnChecksumChar
 }
 
 function isValidIBAN(accountNumber) {
   accountNumber = removeAllWhiteSpaces(accountNumber)
-  const localAccountNumber = accountNumber.substring(4, 18),
-        countryCode = accountNumber.substring(0, 2),
-        checksum = accountNumber.substring(2, 4)
+  const
+    countryCodeAndChecksum = accountNumber.substr(0, 4),
+    localAccountNumber = accountNumber.substr(4, 14)
 
-  return modForLargeNumber(localAccountNumber +
-                           countryCodeToNumber(countryCode) +
-                           checksum, 97) === 1
+  return modForLargeNumber(lettersToNumbers(localAccountNumber + countryCodeAndChecksum), 97) === 1
 }
 
 const FinnishBankUtils = {
@@ -92,6 +95,14 @@ const FinnishBankUtils = {
     }
 
     refNumber = removeAllWhiteSpaces(refNumber)
+
+    if (/^RF/.test(refNumber)) {
+      if (!isValidIBAN(refNumber)) {
+        return false
+      }
+      refNumber = refNumber.substr(4)
+    }
+
     refNumber = removeLeadingZeros(refNumber)
 
     let checksum = 0,
@@ -101,7 +112,7 @@ const FinnishBankUtils = {
     for (let i = 0; i < refNumberLengthNoChecksum; i++) {
       checksum += REF_NUMBER_MULTIPLIERS[i % REF_NUMBER_MULTIPLIERS.length] * parseInt(refNumber.charAt(i), 10)
     }
-    checksumNumber = 10 - checksum % 10;
+    checksumNumber = 10 - checksum % 10
 
     if (checksumNumber === 10) {
       checksumNumber = 0
@@ -137,7 +148,7 @@ const FinnishBankUtils = {
       checksum += REF_NUMBER_MULTIPLIERS[i % REF_NUMBER_MULTIPLIERS.length] * parseInt(refNumber.charAt(i), 10)
     }
 
-    checksumNumber = 10 - checksum % 10;
+    checksumNumber = 10 - checksum % 10
     if (checksumNumber === 10) {
       checksumNumber = 0
     }
@@ -153,7 +164,7 @@ const FinnishBankUtils = {
 
     const defaultCheckDigit = '00',
           danskeBankOffice = '800026',  //  Use a real bank and office for simplicity
-          countryCodeInDigits = countryCodeToNumber('FI'),
+          countryCodeInDigits = lettersToNumbers('FI'),
           bankAccount = randomNumberWithLength(7),
           localAccountNumber = danskeBankOffice + bankAccount + luhnMod10(danskeBankOffice + bankAccount)
 
