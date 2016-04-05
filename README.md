@@ -36,7 +36,6 @@ Browser: Writes FinnishBankUtils into global namespace.
 <script>
   FinnishBankUtils.isValidFinnishIBAN('FI9080002627761348')
 </script>
-
 ```
 
 Examples
@@ -53,6 +52,21 @@ FinnishBankUtils.isValidFinnishIBAN('FI 90 800026 2776 1348')
 # !! Reference number type must be a string !!
 FinnishBankUtils.isValidFinnishRefNumber('1511890656')
 FinnishBankUtils.isValidFinnishRefNumber('15118 90656')
+FinnishBankUtils.isValidFinnishRefNumber('RF34 1234 561')
+```
+
+```sh
+# Valid IBAN returns formatted version, allows whitespace
+FinnishBankUtils.formatFinnishIBAN('FI9080002627761348')
+// 'FI90 8000 2627 7613 48'
+```
+
+```sh
+# Valid reference number returns formatted version, allows whitespace
+FinnishBankUtils.formatFinnishRefNumber('1511890656')
+// '15118 90656'
+FinnishBankUtils.formatFinnishRefNumber('RF341234561')
+// 'RF34 1234 561'
 ```
 
 ```sh
@@ -71,16 +85,22 @@ Functions
 ---------
 
 ##### isValidFinnishRefNumber(referenceNumber) : string --> boolean
--Validates parameter given reference number
+- Validates parameter given reference number
 
 ##### isValidFinnishIBAN(ibanNumber) : string --> boolean
--Validates parameter given Finnish IBAN number
+- Validates parameter given Finnish IBAN number
+
+##### formatFinnishRefNumber(referenceNumber) : string --> string
+- Formats parameter given reference number
+
+##### formatFinnishIBAN(ibanNumber) : string --> string
+- Formats parameter given Finnish IBAN number
 
 ##### generateFinnishRefNumber() : void --> string
--Generates a random 10 char long Finnish reference number
+- Generates a random 10 char long Finnish reference number
 
 ##### generateFinnishIBAN() : void --> string
--Generates a random Finnish IBAN number
+- Generates a random Finnish IBAN number
 
 Building
 --------
