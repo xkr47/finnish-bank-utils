@@ -17,8 +17,8 @@ describe('finnish-banking', () => {
       expect(finnishBanking.isValidFinnishRefNumber(null)).to.equal(false)
     })
 
-    it('Should fail when given too short refnumber (3 chars)', () => {
-      expect(finnishBanking.isValidFinnishRefNumber('123')).to.equal(false)
+    it('Should fail when given too short refnumber (2 chars)', () => {
+      expect(finnishBanking.isValidFinnishRefNumber('12')).to.equal(false)
     })
 
     it('Should fail when given too long refnumber (21 chars)', () => {
@@ -26,12 +26,15 @@ describe('finnish-banking', () => {
     })
 
     it('Should pass when given valid refnumbers', () => {
-      const validRefs = ['1234561',
-                          '1511890656',
-                          '3222190631525115',
-                          '1231180652526617',
-                          '01030100067175800018',
-                          '3004101416423555']
+      const validRefs = [
+        '123',
+        '1234561',
+        '1511890656',
+        '3222190631525115',
+        '1231180652526617',
+        '01030100067175800018',
+        '3004101416423555'
+      ]
       validRefs.forEach((refNumber) => {
         expect(finnishBanking.isValidFinnishRefNumber(refNumber)).to.equal(true)
       })
