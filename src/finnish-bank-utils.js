@@ -1,7 +1,7 @@
 'use strict'
 
 const REF_NUMBER_MULTIPLIERS = [1, 3, 7],
-      REF_NUMBER_REGEX =  /^(\d{4,20}|RF\d{6,23})$/i,
+      REF_NUMBER_REGEX = /^(\d{4,20}|RF\d{6,23})$/i,
       FINNISH_IBAN_REGEX = /^FI\d{16}$/,
       IBAN_OFFSET_FROM_ASCIICODE = -55
 
