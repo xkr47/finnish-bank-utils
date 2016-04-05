@@ -95,12 +95,12 @@
     return luhnMod10(localAccountNumberWithoutCheckSum) === luhnChecksumChar;
   }
 
-  function isValidIBAN(accountNumber) {
-    accountNumber = removeAllWhiteSpaces(accountNumber);
-    var countryCodeAndChecksum = accountNumber.substr(0, 4),
-        localAccountNumber = accountNumber.substr(4, 14);
+  function isValidIBAN(iban) {
+    iban = removeAllWhiteSpaces(iban);
+    var prefixAndChecksum = iban.substr(0, 4),
+        number = iban.substr(4);
 
-    return modForLargeNumber(lettersToNumbers(localAccountNumber + countryCodeAndChecksum), 97) === 1;
+    return modForLargeNumber(lettersToNumbers(number + prefixAndChecksum), 97) === 1;
   }
 
   var FinnishBankUtils = {
