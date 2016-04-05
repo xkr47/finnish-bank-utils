@@ -13,8 +13,8 @@ function removeLeadingZeros(str) {
   return str.replace(/^0+/, '')
 }
 
-function lettersToNumbers(string) {
-  return [...string].map(char => {
+function lettersToNumbers(str) {
+  return [...str].map(char => {
     if (/\D/.test(char)) {
       return String(char.charCodeAt(0) + IBAN_OFFSET_FROM_ASCIICODE)
     }
@@ -179,4 +179,4 @@ const FinnishBankUtils = {
 
 }
 
-module.exports = FinnishBankUtils
+module.exports = Object.freeze(FinnishBankUtils)

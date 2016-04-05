@@ -38,8 +38,8 @@
     return str.replace(/^0+/, '');
   }
 
-  function lettersToNumbers(string) {
-    return [].concat(_toConsumableArray(string)).map(function (char) {
+  function lettersToNumbers(str) {
+    return [].concat(_toConsumableArray(str)).map(function (char) {
       if (/\D/.test(char)) {
         return String(char.charCodeAt(0) + IBAN_OFFSET_FROM_ASCIICODE);
       }
@@ -174,6 +174,6 @@
     }
   };
 
-  module.exports = FinnishBankUtils;
+  module.exports = Object.freeze(FinnishBankUtils);
 });
 
