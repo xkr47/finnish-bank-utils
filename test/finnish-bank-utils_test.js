@@ -279,6 +279,10 @@ describe('finnish-bank-utils', () => {
       expect(FinnishBankUtils.parseFinnishVirtualBarCode('4581017100000012200048299000000005595822432946711201AA')).to.equal(false)
     })
 
+    it('Should return false when given too short bar code', () => {
+      expect(FinnishBankUtils.parseFinnishVirtualBarCode('45810171000000122000482990000000055958224329467112013')).to.equal(false)
+    })
+
     it('Should return false when given too long bar code', () => {
       expect(FinnishBankUtils.parseFinnishVirtualBarCode('4581017100000012200048299000000005595822432946711201312')).to.equal(false)
     })
