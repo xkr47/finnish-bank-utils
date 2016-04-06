@@ -115,7 +115,7 @@ function sliceVirtualBarCode(barCode) {
 const FinnishBankUtils = {
 
   /**
-   * Validate parameter given finnish banking reference number.
+   * Validate parameter given Finnish banking reference number.
    * Allows grouping of numbers with whitespace.
    * @param refNumber - {String} Reference number to parse, for example: 1234 56789 123123
    * @returns {boolean}
@@ -165,7 +165,7 @@ const FinnishBankUtils = {
   },
 
   /**
-   * Validate finnish IBAN. Allows grouping of numbers with whitespace.
+   * Validate Finnish IBAN. Allows grouping of numbers with whitespace.
    *
    * @param accountNumber - {String} Account number to validate: FI 90 800026 2776 1348
    * @returns {boolean}
@@ -183,7 +183,7 @@ const FinnishBankUtils = {
   },
 
   /**
-   * Format finnish reference number. Adds whitespace every 5 or 4 characters
+   * Format Finnish reference number. Adds whitespace every 5 or 4 characters
    *
    * @param refNumber - {String} Reference number to format: RF341234561
    * @param separator - {String} Whitespace or other string to be used
@@ -203,7 +203,7 @@ const FinnishBankUtils = {
   },
 
   /**
-   * Format finnish IBAN. Adds whitespace every 4 characters
+   * Format Finnish IBAN. Adds whitespace every 4 characters
    *
    * @param accountNumber - {String} Account number to format: FI9080002627761348
    * @param separator - {String} Whitespace or other string to be used
@@ -243,7 +243,7 @@ const FinnishBankUtils = {
   },
 
   /**
-   * Returns a semi-random valid finnish Iban bank account number
+   * Returns a semi-random valid Finnish Iban bank account number
    * https://en.wikipedia.org/wiki/International_Bank_Account_Number#Generating_IBAN_check_digits
    * @returns {string} IBAN string, for example FI9080002627761348
    */
@@ -264,7 +264,7 @@ const FinnishBankUtils = {
   },
 
   /**
-   * Parse finnish virtual bar code (aka virtuaaliviivakoodi, pankkiviidakoodi).
+   * Parse Finnish virtual bar code (aka virtuaaliviivakoodi, pankkiviidakoodi).
    * Supports versions 4 and 5
    * Based on: http://www.finanssiala.fi/maksujenvalitys/dokumentit/Pankkiviivakoodi-opas.pdf
    *

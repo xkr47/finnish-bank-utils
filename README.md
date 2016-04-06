@@ -69,7 +69,7 @@ FinnishBankUtils.formatFinnishRefNumber('RF341234561')
 ```
 
 ```js
-# Parse finnish virtual bar code (virtuaaliviidakoodi, pankkiviivakoodi)
+# Parse Finnish virtual bar code (virtuaaliviidakoodi, pankkiviivakoodi)
 # Supports versions 4 and 5
 FinnishBankUtils.parseFinnishVirtualBarCode('458101710000001220004829900000000559582243294671120131')
 // {iban: 'FI58 1017 1000 0001 22', sum: 482.99, reference: '55958 22432 94671', date: '31.1.2012'}
@@ -103,6 +103,9 @@ Functions
 
 ##### formatFinnishIBAN(ibanNumber) : string --> string
 - Formats parameter given Finnish IBAN number
+
+##### parseFinnishVirtualBarCode(ibanNumber) : string --> object
+- Parses parameter given Finnish virtual bar code
 
 ##### generateFinnishRefNumber() : void --> string
 - Generates a random 10 char long Finnish reference number
