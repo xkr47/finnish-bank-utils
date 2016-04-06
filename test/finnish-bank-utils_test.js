@@ -34,6 +34,7 @@ describe('finnish-bank-utils', () => {
         '1234561',
         'RF341234561',
         '1511890656',
+        '559582243294671',
         'RF601511890656',
         '3222190631525115',
         '1231180652526617',
@@ -53,6 +54,7 @@ describe('finnish-bank-utils', () => {
         ' 123456 1 ',
         'RF34 1234 561',
         '15118 90656',
+        '55958 22432 94671',
         'RF60 1511 8906 56',
         '3 22219 06315 25115',
         '1 23118 06525 26617',
@@ -249,6 +251,80 @@ describe('finnish-bank-utils', () => {
         const generated = FinnishBankUtils.generateFinnishIBAN()
         expect(FinnishBankUtils.isValidFinnishIBAN(generated)).to.equal(true)
       }
+    })
+  })
+
+  describe('#parseFinnishVirtualBarCode', () => {
+    it('Should return false when given empty String', () => {
+      expect(FinnishBankUtils.parseFinnishVirtualBarCode('')).to.equal(false)
+    })
+
+    it('Should return false when given undefined', () => {
+      expect(FinnishBankUtils.parseFinnishVirtualBarCode(undefined)).to.equal(false)
+    })
+
+    it('Should return false when given null', () => {
+      expect(FinnishBankUtils.parseFinnishVirtualBarCode(null)).to.equal(false)
+    })
+
+    it('Should return false when given non String', () => {
+      expect(FinnishBankUtils.parseFinnishVirtualBarCode({})).to.equal(false)
+      expect(FinnishBankUtils.parseFinnishVirtualBarCode(Date())).to.equal(false)
+      expect(FinnishBankUtils.parseFinnishVirtualBarCode(3)).to.equal(false)
+      expect(FinnishBankUtils.parseFinnishVirtualBarCode(['a'])).to.equal(false)
+      expect(FinnishBankUtils.parseFinnishVirtualBarCode(NaN)).to.equal(false)
+    })
+
+    it('Should return false when given almost valid bar code with letters in the end', () => {
+      expect(FinnishBankUtils.parseFinnishVirtualBarCode('4581017100000012200048299000000005595822432946711201AA')).to.equal(false)
+    })
+
+    it('Should return false when given too long bar code', () => {
+      expect(FinnishBankUtils.parseFinnishVirtualBarCode('4581017100000012200048299000000005595822432946711201312')).to.equal(false)
+    })
+
+    it('Should return correctly when given valid bank bar code', () => {
+      const barCodes = {
+        '458101710000001220004829900000000559582243294671120131': {
+          iban: 'FI58 1017 1000 0001 22',
+          sum: 482.99,
+          reference: '55958 22432 94671',
+          date: '31.1.2012'
+        },
+        '402500046400013020006938000000069875672083435364110724': {
+          iban: 'FI02 5000 4640 0013 02',
+          sum: 693.8,
+          reference: '69 87567 20834 35364',
+          date: '24.7.2011'
+        },
+        '415660100015306410074445400000007758474790647489191219': {
+          iban: 'FI15 6601 0001 5306 41',
+          sum: 7444.54,
+          reference: '7 75847 47906 47489',
+          date: '19.12.2019'
+        },
+        '502500046400013020006938061000000000698756720839110724': {
+          iban: 'FI02 5000 4640 0013 02',
+          sum: 693.8,
+          reference: 'RF61 6987 5672 0839',
+          date: '24.7.2011'
+        },
+        '516800014000502670009358560000078777679656628687000000': {
+          iban: 'FI16 8000 1400 0502 67',
+          sum: 935.85,
+          reference: 'RF60 7877 7679 6566 2868 7',
+          date: undefined
+        },
+        '515660100015306410074445484000007758474790647489191219': {
+          iban: 'FI15 6601 0001 5306 41',
+          sum: 7444.54,
+          reference: 'RF84 7758 4747 9064 7489',
+          date: '19.12.2019'
+        }
+      }
+      Object.keys(barCodes).forEach(barCode =>
+        expect(FinnishBankUtils.parseFinnishVirtualBarCode(barCode)).to.deep.equal(barCodes[barCode])
+      )
     })
   })
 

@@ -1,7 +1,7 @@
 'use strict'
 
 const
-  REF_NUMBER_MULTIPLIERS = [1, 3, 7],
+  REF_NUMBER_MULTIPLIERS = [7, 3, 1],
   REF_NUMBER_REGEX = /^(\d{4,20}|RF\d{6,23})$/i,
   FINNISH_IBAN_REGEX = /^FI\d{16}$/,
   IBAN_OFFSET_FROM_ASCIICODE = -55
@@ -93,6 +93,24 @@ function isValidIBAN(iban) {
   return modForLargeNumber(lettersToNumbers(number + prefixAndChecksum), 97) === 1
 }
 
+function sliceVirtualBarCode(barCode) {
+  const version = barCode.substr(0, 1)
+  let slices
+  if (version == 4) {
+    slices = [1, 16, 6, 2, 3, 20, 2, 2, 2]
+  } else if (version == 5) {
+    slices = [1, 16, 6, 2, 0, 23, 2, 2, 2]
+  } else {
+    return
+  }
+  let index = 0
+  return slices.map(length => {
+    const slice = barCode.substr(index, length)
+    index += length
+    return slice
+  })
+}
+
 
 const FinnishBankUtils = {
 
@@ -119,17 +137,22 @@ const FinnishBankUtils = {
         return false
       }
       refNumber = refNumber.substr(4)
+    } else {
+      refNumber = removeLeadingZeros(refNumber)
     }
 
-    refNumber = removeLeadingZeros(refNumber)
+    const
+      reversedRefNumber = reverseString(refNumber),
+      providedChecksumNumber = parseInt(reversedRefNumber.charAt(0))
+
+    refNumber = reversedRefNumber.substr(1)
 
     let
       checksum = 0,
-      refNumberLengthNoChecksum = refNumber.length - 1,
       checksumNumber
 
-    for (let i = 0; i < refNumberLengthNoChecksum; i++) {
-      checksum += REF_NUMBER_MULTIPLIERS[i % REF_NUMBER_MULTIPLIERS.length] * parseInt(refNumber.charAt(i), 10)
+    for (let i = 0; i < refNumber.length; i++) {
+      checksum += REF_NUMBER_MULTIPLIERS[i % REF_NUMBER_MULTIPLIERS.length] * parseInt(refNumber.charAt(i))
     }
 
     checksumNumber = 10 - checksum % 10
@@ -138,7 +161,7 @@ const FinnishBankUtils = {
       checksumNumber = 0
     }
 
-    return checksumNumber === parseInt(refNumber.charAt(refNumberLengthNoChecksum))
+    return checksumNumber === providedChecksumNumber
   },
 
   /**
@@ -198,13 +221,16 @@ const FinnishBankUtils = {
    * @returns {String} - For example '1776750586'
    */
   generateFinnishRefNumber() {
-    const refNumber = randomNumberWithLength(9).toString()
+    const
+      refNumber = randomNumberWithLength(9).toString(),
+      reversedRefNumber = reverseString(refNumber)
+
     let
       checksum = 0,
       checksumNumber
 
-    for (let i = 0; i < refNumber.length; i++) {
-      checksum += REF_NUMBER_MULTIPLIERS[i % REF_NUMBER_MULTIPLIERS.length] * parseInt(refNumber.charAt(i), 10)
+    for (let i = 0; i < reversedRefNumber.length; i++) {
+      checksum += REF_NUMBER_MULTIPLIERS[i % REF_NUMBER_MULTIPLIERS.length] * parseInt(reversedRefNumber.charAt(i))
     }
 
     checksumNumber = 10 - checksum % 10
@@ -235,6 +261,50 @@ const FinnishBankUtils = {
       checkChars = checkDigit >= 10 ? checkDigit.toString() : '0' + checkDigit
 
     return 'FI' + checkChars + localAccountNumber
+  },
+
+  /**
+   * Parse finnish virtual bar code (aka virtuaaliviivakoodi, pankkiviidakoodi).
+   * Supports versions 4 and 5
+   * Based on: http://www.finanssiala.fi/maksujenvalitys/dokumentit/Pankkiviivakoodi-opas.pdf
+   *
+   * @param barCode - {String} Bar code to parse: 458101710000001220004829900000000559582243294671120131
+   * @returns {object|false}
+   */
+  parseFinnishVirtualBarCode(barCode) {
+    if (
+      !barCode ||
+      typeof barCode != 'string' ||
+      barCode.length != 54 ||
+      !/^\d+$/.test(barCode)
+    ) {
+      return false
+    }
+
+    const sliced = sliceVirtualBarCode(barCode)
+
+    if (!sliced) {
+      return false
+    }
+
+    let [version, iban, euros, cents, reserve, reference, year, month, day] = sliced
+
+    iban = this.formatFinnishIBAN('FI' + iban)
+    const sum = Number(euros) + Number(cents) / 100
+
+    if (version == 5) {
+      reference = 'RF' + reference.substr(0, 2) + removeLeadingZeros(reference.substr(2))
+    }
+    reference = this.formatFinnishRefNumber(reference)
+
+    let date
+    day = Number(day)
+    month = Number(month)
+    if (day > 0 && month > 0) {
+      date = `${day}.${month}.20${year}`
+    }
+
+    return {iban, sum, reference, date}
   }
 
 }
