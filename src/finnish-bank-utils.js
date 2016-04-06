@@ -1,9 +1,11 @@
 'use strict'
 
-const REF_NUMBER_MULTIPLIERS = [1, 3, 7],
-      REF_NUMBER_REGEX = /^(\d{4,20}|RF\d{6,23})$/i,
-      FINNISH_IBAN_REGEX = /^FI\d{16}$/,
-      IBAN_OFFSET_FROM_ASCIICODE = -55
+const
+  REF_NUMBER_MULTIPLIERS = [7, 3, 1],
+  REF_NUMBER_REGEX = /^(\d{4,20}|RF\d{6,23})$/i,
+  FINNISH_IBAN_REGEX = /^FI\d{16}$/,
+  IBAN_OFFSET_FROM_ASCIICODE = -55
+
 
 function removeAllWhiteSpaces(str) {
   return str.replace(/\s+/g, '')
@@ -36,7 +38,7 @@ function removeStringFromEnd(str, strToRemove) {
 function randomNumberWithLength(length) {
   let randomNumber = ''
   for (let i = 0; i < length; i++) {
-    randomNumber += Math.floor(Math.random() * 9) + 1 //  1...9, because a real number can't begin with zero
+    randomNumber += Math.floor(Math.random() * 9) + 1 // 1...9, because a real number can't begin with zero
   }
   return parseInt(randomNumber, 10)
 }
@@ -91,17 +93,40 @@ function isValidIBAN(iban) {
   return modForLargeNumber(lettersToNumbers(number + prefixAndChecksum), 97) === 1
 }
 
+function sliceVirtualBarCode(barCode) {
+  const version = barCode.substr(0, 1)
+  let slices
+  if (version == 4) {
+    slices = [1, 16, 6, 2, 3, 20, 2, 2, 2]
+  } else if (version == 5) {
+    slices = [1, 16, 6, 2, 0, 23, 2, 2, 2]
+  } else {
+    return
+  }
+  let index = 0
+  return slices.map(length => {
+    const slice = barCode.substr(index, length)
+    index += length
+    return slice
+  })
+}
+
+
 const FinnishBankUtils = {
 
   /**
-   * Validate parameter given finnish banking reference number.
+   * Validate parameter given Finnish banking reference number.
    * Allows grouping of numbers with whitespace.
    * @param refNumber - {String} Reference number to parse, for example: 1234 56789 123123
    * @returns {boolean}
    */
   isValidFinnishRefNumber(refNumber) {
     //  Sanity and format check, which allows to make safe assumptions on the format.
-    if (!refNumber || typeof refNumber !== 'string' || !REF_NUMBER_REGEX.test(removeAllWhiteSpaces(refNumber.toUpperCase()))) {
+    if (
+      !refNumber ||
+      typeof refNumber !== 'string' ||
+      !REF_NUMBER_REGEX.test(removeAllWhiteSpaces(refNumber.toUpperCase()))
+    ) {
       return false
     }
 
@@ -112,33 +137,45 @@ const FinnishBankUtils = {
         return false
       }
       refNumber = refNumber.substr(4)
+    } else {
+      refNumber = removeLeadingZeros(refNumber)
     }
 
-    refNumber = removeLeadingZeros(refNumber)
+    const
+      reversedRefNumber = reverseString(refNumber),
+      providedChecksumNumber = parseInt(reversedRefNumber.charAt(0))
 
-    let checksum = 0,
-        refNumberLengthNoChecksum = refNumber.length - 1,
-        checksumNumber
+    refNumber = reversedRefNumber.substr(1)
 
-    for (let i = 0; i < refNumberLengthNoChecksum; i++) {
-      checksum += REF_NUMBER_MULTIPLIERS[i % REF_NUMBER_MULTIPLIERS.length] * parseInt(refNumber.charAt(i), 10)
+    let
+      checksum = 0,
+      checksumNumber
+
+    for (let i = 0; i < refNumber.length; i++) {
+      checksum += REF_NUMBER_MULTIPLIERS[i % REF_NUMBER_MULTIPLIERS.length] * parseInt(refNumber.charAt(i))
     }
+
     checksumNumber = 10 - checksum % 10
 
     if (checksumNumber === 10) {
       checksumNumber = 0
     }
-    return checksumNumber === parseInt(refNumber.charAt(refNumberLengthNoChecksum))
+
+    return checksumNumber === providedChecksumNumber
   },
 
   /**
-   * Validate finnish IBAN. Allows grouping of numbers with whitespace.
+   * Validate Finnish IBAN. Allows grouping of numbers with whitespace.
    *
    * @param accountNumber - {String} Account number to validate: FI 90 800026 2776 1348
    * @returns {boolean}
    */
   isValidFinnishIBAN(accountNumber) {
-    if (typeof accountNumber !== 'string' || !FINNISH_IBAN_REGEX.test(removeAllWhiteSpaces(accountNumber.toUpperCase()))) {
+    if (
+      !accountNumber ||
+      typeof accountNumber !== 'string' ||
+      !FINNISH_IBAN_REGEX.test(removeAllWhiteSpaces(accountNumber.toUpperCase()))
+    ) {
       return false
     }
 
@@ -146,7 +183,7 @@ const FinnishBankUtils = {
   },
 
   /**
-   * Format finnish reference number. Adds whitespace every 5 or 4 characters
+   * Format Finnish reference number. Adds whitespace every 5 or 4 characters
    *
    * @param refNumber - {String} Reference number to format: RF341234561
    * @param separator - {String} Whitespace or other string to be used
@@ -166,7 +203,7 @@ const FinnishBankUtils = {
   },
 
   /**
-   * Format finnish IBAN. Adds whitespace every 4 characters
+   * Format Finnish IBAN. Adds whitespace every 4 characters
    *
    * @param accountNumber - {String} Account number to format: FI9080002627761348
    * @param separator - {String} Whitespace or other string to be used
@@ -184,41 +221,90 @@ const FinnishBankUtils = {
    * @returns {String} - For example '1776750586'
    */
   generateFinnishRefNumber() {
-    const refNumber = randomNumberWithLength(9).toString()
-    let checksum = 0,
-        checksumNumber
+    const
+      refNumber = randomNumberWithLength(9).toString(),
+      reversedRefNumber = reverseString(refNumber)
 
-    for (let i = 0; i < refNumber.length; i++) {
-      checksum += REF_NUMBER_MULTIPLIERS[i % REF_NUMBER_MULTIPLIERS.length] * parseInt(refNumber.charAt(i), 10)
+    let
+      checksum = 0,
+      checksumNumber
+
+    for (let i = 0; i < reversedRefNumber.length; i++) {
+      checksum += REF_NUMBER_MULTIPLIERS[i % REF_NUMBER_MULTIPLIERS.length] * parseInt(reversedRefNumber.charAt(i))
     }
 
     checksumNumber = 10 - checksum % 10
+
     if (checksumNumber === 10) {
       checksumNumber = 0
     }
+
     return refNumber + checksumNumber
   },
 
   /**
-   * Returns a semi-random valid finnish Iban bank account number
+   * Returns a semi-random valid Finnish Iban bank account number
    * https://en.wikipedia.org/wiki/International_Bank_Account_Number#Generating_IBAN_check_digits
    * @returns {string} IBAN string, for example FI9080002627761348
    */
   generateFinnishIBAN() {
+    const
+      defaultCheckDigit = '00',
+      danskeBankOffice = '800026',  //  Use a real bank and office for simplicity
+      countryCodeInDigits = lettersToNumbers('FI'),
+      bankAccount = randomNumberWithLength(7),
+      localAccountNumber = danskeBankOffice + bankAccount + luhnMod10(danskeBankOffice + bankAccount),
 
-    const defaultCheckDigit = '00',
-          danskeBankOffice = '800026',  //  Use a real bank and office for simplicity
-          countryCodeInDigits = lettersToNumbers('FI'),
-          bankAccount = randomNumberWithLength(7),
-          localAccountNumber = danskeBankOffice + bankAccount + luhnMod10(danskeBankOffice + bankAccount)
+      accountNumberCandidate = localAccountNumber + countryCodeInDigits + defaultCheckDigit,
 
-    const accountNumberCandidate = localAccountNumber +
-                                   countryCodeInDigits +
-                                   defaultCheckDigit
+      checkDigit = 98 - modForLargeNumber(accountNumberCandidate, 97),
+      checkChars = checkDigit >= 10 ? checkDigit.toString() : '0' + checkDigit
 
-    const checkDigit = 98 - modForLargeNumber(accountNumberCandidate, 97)
-    const checkChars = checkDigit >= 10 ? (checkDigit.toString()) : ('0' + checkDigit)
     return 'FI' + checkChars + localAccountNumber
+  },
+
+  /**
+   * Parse Finnish virtual bar code (aka virtuaaliviivakoodi, pankkiviidakoodi).
+   * Supports versions 4 and 5
+   * Based on: http://www.finanssiala.fi/maksujenvalitys/dokumentit/Pankkiviivakoodi-opas.pdf
+   *
+   * @param barCode - {String} Bar code to parse: 458101710000001220004829900000000559582243294671120131
+   * @returns {object|false}
+   */
+  parseFinnishVirtualBarCode(barCode) {
+    if (
+      !barCode ||
+      typeof barCode != 'string' ||
+      barCode.length != 54 ||
+      !/^\d+$/.test(barCode)
+    ) {
+      return false
+    }
+
+    const sliced = sliceVirtualBarCode(barCode)
+
+    if (!sliced) {
+      return false
+    }
+
+    let [version, iban, euros, cents, reserve, reference, year, month, day] = sliced
+
+    iban = this.formatFinnishIBAN('FI' + iban)
+    const sum = Number(euros) + Number(cents) / 100
+
+    if (version == 5) {
+      reference = 'RF' + reference.substr(0, 2) + removeLeadingZeros(reference.substr(2))
+    }
+    reference = this.formatFinnishRefNumber(reference)
+
+    let date
+    day = Number(day)
+    month = Number(month)
+    if (day > 0 && month > 0) {
+      date = `${day}.${month}.20${year}`
+    }
+
+    return {iban, sum, reference, date}
   }
 
 }
