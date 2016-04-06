@@ -104,7 +104,11 @@ const FinnishBankUtils = {
    */
   isValidFinnishRefNumber(refNumber) {
     //  Sanity and format check, which allows to make safe assumptions on the format.
-    if (!refNumber || typeof refNumber !== 'string' || !REF_NUMBER_REGEX.test(removeAllWhiteSpaces(refNumber.toUpperCase()))) {
+    if (
+      !refNumber ||
+      typeof refNumber !== 'string' ||
+      !REF_NUMBER_REGEX.test(removeAllWhiteSpaces(refNumber.toUpperCase()))
+    ) {
       return false
     }
 
@@ -144,7 +148,11 @@ const FinnishBankUtils = {
    * @returns {boolean}
    */
   isValidFinnishIBAN(accountNumber) {
-    if (typeof accountNumber !== 'string' || !FINNISH_IBAN_REGEX.test(removeAllWhiteSpaces(accountNumber.toUpperCase()))) {
+    if (
+      !accountNumber ||
+      typeof accountNumber !== 'string' ||
+      !FINNISH_IBAN_REGEX.test(removeAllWhiteSpaces(accountNumber.toUpperCase()))
+    ) {
       return false
     }
 
