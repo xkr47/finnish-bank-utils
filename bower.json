@@ -1,11 +1,12 @@
 {
   "name": "finnish-bank-utils",
   "main": "./dist/finnish-bank-utils.min.js",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "authors": [
-    "vkomulai <ville.komulainen@iki.fi>"
+    "vkomulai <ville.komulainen@iki.fi>",
+    "Sakari Tuominen"
   ],
-  "description": "A micro Javascript library for validating, creating and formatting Finnish IBAN bank account numbers and reference numbers",
+  "description": "A micro Javascript library for validating, creating and formatting Finnish IBAN bank account numbers and reference numbers. Can parse payment details from Finnish virtual barcodes.",
   "moduleType": [
     "globals",
     "node"
@@ -17,7 +18,10 @@
     "Validation",
     "Viitenumero",
     "Tilinumero",
-    "Reference number"
+    "Reference number",
+    "Virtual barcode",
+    "Pankkiviidakoodi",
+    "Virtuaaliviivakoodi"
   ],
   "license": "MIT",
   "homepage": "https://github.com/vkomulai/finnish-bank-utils",
