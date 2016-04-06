@@ -1,9 +1,11 @@
 'use strict'
 
-const REF_NUMBER_MULTIPLIERS = [1, 3, 7],
-      REF_NUMBER_REGEX = /^(\d{4,20}|RF\d{6,23})$/i,
-      FINNISH_IBAN_REGEX = /^FI\d{16}$/,
-      IBAN_OFFSET_FROM_ASCIICODE = -55
+const
+  REF_NUMBER_MULTIPLIERS = [1, 3, 7],
+  REF_NUMBER_REGEX = /^(\d{4,20}|RF\d{6,23})$/i,
+  FINNISH_IBAN_REGEX = /^FI\d{16}$/,
+  IBAN_OFFSET_FROM_ASCIICODE = -55
+
 
 function removeAllWhiteSpaces(str) {
   return str.replace(/\s+/g, '')
@@ -36,7 +38,7 @@ function removeStringFromEnd(str, strToRemove) {
 function randomNumberWithLength(length) {
   let randomNumber = ''
   for (let i = 0; i < length; i++) {
-    randomNumber += Math.floor(Math.random() * 9) + 1 //  1...9, because a real number can't begin with zero
+    randomNumber += Math.floor(Math.random() * 9) + 1 // 1...9, because a real number can't begin with zero
   }
   return parseInt(randomNumber, 10)
 }
@@ -91,6 +93,7 @@ function isValidIBAN(iban) {
   return modForLargeNumber(lettersToNumbers(number + prefixAndChecksum), 97) === 1
 }
 
+
 const FinnishBankUtils = {
 
   /**
@@ -116,18 +119,21 @@ const FinnishBankUtils = {
 
     refNumber = removeLeadingZeros(refNumber)
 
-    let checksum = 0,
-        refNumberLengthNoChecksum = refNumber.length - 1,
-        checksumNumber
+    let
+      checksum = 0,
+      refNumberLengthNoChecksum = refNumber.length - 1,
+      checksumNumber
 
     for (let i = 0; i < refNumberLengthNoChecksum; i++) {
       checksum += REF_NUMBER_MULTIPLIERS[i % REF_NUMBER_MULTIPLIERS.length] * parseInt(refNumber.charAt(i), 10)
     }
+
     checksumNumber = 10 - checksum % 10
 
     if (checksumNumber === 10) {
       checksumNumber = 0
     }
+
     return checksumNumber === parseInt(refNumber.charAt(refNumberLengthNoChecksum))
   },
 
@@ -185,17 +191,20 @@ const FinnishBankUtils = {
    */
   generateFinnishRefNumber() {
     const refNumber = randomNumberWithLength(9).toString()
-    let checksum = 0,
-        checksumNumber
+    let
+      checksum = 0,
+      checksumNumber
 
     for (let i = 0; i < refNumber.length; i++) {
       checksum += REF_NUMBER_MULTIPLIERS[i % REF_NUMBER_MULTIPLIERS.length] * parseInt(refNumber.charAt(i), 10)
     }
 
     checksumNumber = 10 - checksum % 10
+
     if (checksumNumber === 10) {
       checksumNumber = 0
     }
+
     return refNumber + checksumNumber
   },
 
@@ -205,19 +214,18 @@ const FinnishBankUtils = {
    * @returns {string} IBAN string, for example FI9080002627761348
    */
   generateFinnishIBAN() {
+    const
+      defaultCheckDigit = '00',
+      danskeBankOffice = '800026',  //  Use a real bank and office for simplicity
+      countryCodeInDigits = lettersToNumbers('FI'),
+      bankAccount = randomNumberWithLength(7),
+      localAccountNumber = danskeBankOffice + bankAccount + luhnMod10(danskeBankOffice + bankAccount),
 
-    const defaultCheckDigit = '00',
-          danskeBankOffice = '800026',  //  Use a real bank and office for simplicity
-          countryCodeInDigits = lettersToNumbers('FI'),
-          bankAccount = randomNumberWithLength(7),
-          localAccountNumber = danskeBankOffice + bankAccount + luhnMod10(danskeBankOffice + bankAccount)
+      accountNumberCandidate = localAccountNumber + countryCodeInDigits + defaultCheckDigit,
 
-    const accountNumberCandidate = localAccountNumber +
-                                   countryCodeInDigits +
-                                   defaultCheckDigit
+      checkDigit = 98 - modForLargeNumber(accountNumberCandidate, 97),
+      checkChars = checkDigit >= 10 ? checkDigit.toString() : '0' + checkDigit
 
-    const checkDigit = 98 - modForLargeNumber(accountNumberCandidate, 97)
-    const checkChars = checkDigit >= 10 ? (checkDigit.toString()) : ('0' + checkDigit)
     return 'FI' + checkChars + localAccountNumber
   }
 
