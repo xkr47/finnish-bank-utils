@@ -2,8 +2,9 @@
 
 const
   REF_NUMBER_MULTIPLIERS = [7, 3, 1],
-  REF_NUMBER_REGEX = /^(\d{4,20}|RF\d{6,23})$/i,
+  FINNISH_REF_NUMBER_REGEX = /^(\d{4,20}|RF\d{6,23})$/i,
   FINNISH_IBAN_REGEX = /^FI\d{16}$/,
+  FINNISH_VIRTUAL_BAR_CODE_REGEX = /^[45]\d{53}$/,
   IBAN_OFFSET_FROM_ASCIICODE = -55
 
 
@@ -94,14 +95,12 @@ function isValidIBAN(iban) {
 }
 
 function sliceVirtualBarCode(barCode) {
-  const version = barCode.substr(0, 1)
+  const version = Number(barCode.substr(0, 1))
   let slices
-  if (version == 4) {
+  if (version === 4) {
     slices = [1, 16, 6, 2, 3, 20, 2, 2, 2]
-  } else if (version == 5) {
+  } else if (version === 5) {
     slices = [1, 16, 6, 2, 0, 23, 2, 2, 2]
-  } else {
-    return
   }
   let index = 0
   return slices.map(length => {
@@ -125,7 +124,7 @@ const FinnishBankUtils = {
     if (
       !refNumber ||
       typeof refNumber !== 'string' ||
-      !REF_NUMBER_REGEX.test(removeAllWhiteSpaces(refNumber.toUpperCase()))
+      !FINNISH_REF_NUMBER_REGEX.test(removeAllWhiteSpaces(refNumber.toUpperCase()))
     ) {
       return false
     }
@@ -275,24 +274,19 @@ const FinnishBankUtils = {
     if (
       !barCode ||
       typeof barCode != 'string' ||
-      barCode.length != 54 ||
-      !/^\d+$/.test(barCode)
+      !FINNISH_VIRTUAL_BAR_CODE_REGEX.test(barCode)
     ) {
       return false
     }
 
-    const sliced = sliceVirtualBarCode(barCode)
+    let [version, iban, euros, cents, reserve, reference, year, month, day] = sliceVirtualBarCode(barCode)
 
-    if (!sliced) {
-      return false
-    }
-
-    let [version, iban, euros, cents, reserve, reference, year, month, day] = sliced
+    version = Number(version)
 
     iban = this.formatFinnishIBAN('FI' + iban)
     const sum = Number(euros) + Number(cents) / 100
 
-    if (version == 5) {
+    if (version === 5) {
       reference = 'RF' + reference.substr(0, 2) + removeLeadingZeros(reference.substr(2))
     }
     reference = this.formatFinnishRefNumber(reference)
