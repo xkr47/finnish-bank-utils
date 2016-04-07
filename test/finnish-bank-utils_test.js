@@ -287,6 +287,14 @@ describe('finnish-bank-utils', () => {
       expect(FinnishBankUtils.parseFinnishVirtualBarCode('4581017100000012200048299000000005595822432946711201312')).to.equal(false)
     })
 
+    it('Should return false when given bar code with version 3', () => {
+      expect(FinnishBankUtils.parseFinnishVirtualBarCode('300000000000000000000000000000000000000000000000000000')).to.equal(false)
+    })
+
+    it('Should return false when given bar code with version 6', () => {
+      expect(FinnishBankUtils.parseFinnishVirtualBarCode('600000000000000000000000000000000000000000000000000000')).to.equal(false)
+    })
+
     it('Should return correctly when given valid bank bar code', () => {
       const barCodes = {
         '458101710000001220004829900000000559582243294671120131': {

@@ -64,8 +64,9 @@
   }
 
   var REF_NUMBER_MULTIPLIERS = [7, 3, 1],
-      REF_NUMBER_REGEX = /^(\d{4,20}|RF\d{6,23})$/i,
+      FINNISH_REF_NUMBER_REGEX = /^(\d{4,20}|RF\d{6,23})$/i,
       FINNISH_IBAN_REGEX = /^FI\d{16}$/,
+      FINNISH_VIRTUAL_BAR_CODE_REGEX = /^[45]\d{53}$/,
       IBAN_OFFSET_FROM_ASCIICODE = -55;
 
   function removeAllWhiteSpaces(str) {
@@ -153,14 +154,12 @@
   }
 
   function sliceVirtualBarCode(barCode) {
-    var version = barCode.substr(0, 1);
+    var version = Number(barCode.substr(0, 1));
     var slices = void 0;
-    if (version == 4) {
+    if (version === 4) {
       slices = [1, 16, 6, 2, 3, 20, 2, 2, 2];
-    } else if (version == 5) {
+    } else if (version === 5) {
       slices = [1, 16, 6, 2, 0, 23, 2, 2, 2];
-    } else {
-      return;
     }
     var index = 0;
     return slices.map(function (length) {
@@ -173,7 +172,7 @@
   var FinnishBankUtils = {
     isValidFinnishRefNumber: function isValidFinnishRefNumber(refNumber) {
       //  Sanity and format check, which allows to make safe assumptions on the format.
-      if (!refNumber || typeof refNumber !== 'string' || !REF_NUMBER_REGEX.test(removeAllWhiteSpaces(refNumber.toUpperCase()))) {
+      if (!refNumber || typeof refNumber !== 'string' || !FINNISH_REF_NUMBER_REGEX.test(removeAllWhiteSpaces(refNumber.toUpperCase()))) {
         return false;
       }
 
@@ -270,33 +269,31 @@
       return 'FI' + checkChars + localAccountNumber;
     },
     parseFinnishVirtualBarCode: function parseFinnishVirtualBarCode(barCode) {
-      if (!barCode || typeof barCode != 'string' || barCode.length != 54 || !/^\d+$/.test(barCode)) {
+      if (!barCode || typeof barCode != 'string' || !FINNISH_VIRTUAL_BAR_CODE_REGEX.test(barCode)) {
         return false;
       }
 
-      var sliced = sliceVirtualBarCode(barCode);
+      var _sliceVirtualBarCode = sliceVirtualBarCode(barCode);
 
-      if (!sliced) {
-        return false;
-      }
+      var _sliceVirtualBarCode2 = _slicedToArray(_sliceVirtualBarCode, 9);
 
-      var _sliced = _slicedToArray(sliced, 9);
+      var version = _sliceVirtualBarCode2[0];
+      var iban = _sliceVirtualBarCode2[1];
+      var euros = _sliceVirtualBarCode2[2];
+      var cents = _sliceVirtualBarCode2[3];
+      var reserve = _sliceVirtualBarCode2[4];
+      var reference = _sliceVirtualBarCode2[5];
+      var year = _sliceVirtualBarCode2[6];
+      var month = _sliceVirtualBarCode2[7];
+      var day = _sliceVirtualBarCode2[8];
 
-      var version = _sliced[0];
-      var iban = _sliced[1];
-      var euros = _sliced[2];
-      var cents = _sliced[3];
-      var reserve = _sliced[4];
-      var reference = _sliced[5];
-      var year = _sliced[6];
-      var month = _sliced[7];
-      var day = _sliced[8];
 
+      version = Number(version);
 
       iban = this.formatFinnishIBAN('FI' + iban);
       var sum = Number(euros) + Number(cents) / 100;
 
-      if (version == 5) {
+      if (version === 5) {
         reference = 'RF' + reference.substr(0, 2) + removeLeadingZeros(reference.substr(2));
       }
       reference = this.formatFinnishRefNumber(reference);
