@@ -393,6 +393,14 @@ describe('finnish-bank-utils', () => {
       expect(FinnishBankUtils.formatFinnishVirtualBarCode({...VALID_OBJECT, sum: 1000000})).to.equal(false)
     })
 
+    it('Should return false when given NaN as sum', () => {
+      expect(FinnishBankUtils.formatFinnishVirtualBarCode({...VALID_OBJECT, sum: NaN})).to.equal(false)
+    })
+
+    it('Should return a bar code when given sum with no decimals', () => {
+      expect(FinnishBankUtils.formatFinnishVirtualBarCode({...VALID_OBJECT, sum: 123})).to.equal('515660100015306410001230084000007758474790647489191219')
+    })
+
     it('Should return false when given sum with too many decimals', () => {
       expect(FinnishBankUtils.formatFinnishVirtualBarCode({...VALID_OBJECT, sum: 123.123})).to.equal(false)
     })
