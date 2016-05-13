@@ -104,7 +104,7 @@ Functions
 ##### formatFinnishIBAN(ibanNumber) : string --> string
 - Formats parameter given Finnish IBAN number
 
-##### parseFinnishVirtualBarCode(ibanNumber) : string --> object
+##### parseFinnishVirtualBarCode(barCode) : string --> object
 - Parses parameter given Finnish virtual bar code
 
 ##### generateFinnishRefNumber() : void --> string
