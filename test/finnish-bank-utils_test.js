@@ -417,6 +417,10 @@ describe('finnish-bank-utils', () => {
       expect(FinnishBankUtils.formatFinnishVirtualBarCode({...VALID_OBJECT, date: '31.13.2016'})).to.equal(false)
     })
 
+    it('Should return a bar code when given date with leading zeros', () => {
+      expect(FinnishBankUtils.formatFinnishVirtualBarCode({...VALID_OBJECT, date: '01.06.2019'})).to.equal('515660100015306410074445484000007758474790647489190601')
+    })
+
     it('Should return correctly when given valid parameters', () => {
       Object.keys(barCodes).forEach(barCode =>
         expect(FinnishBankUtils.formatFinnishVirtualBarCode(barCodes[barCode])).to.equal(barCode)
