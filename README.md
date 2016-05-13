@@ -113,11 +113,11 @@ Functions
 ##### formatFinnishIBAN(ibanNumber) : string --> string
 - Formats parameter given Finnish IBAN number
 
-##### parseFinnishVirtualBarCode(barCode) : string --> object
-- Parses parameter given Finnish virtual bar code
-
 ##### formatFinnishVirtualBarCode({iban : string, sum : number, reference : string, date : string}) : object --> string
 - Formats parameters to Finnish virtual bar code
+
+##### parseFinnishVirtualBarCode(barCode) : string --> object
+- Parses parameter given Finnish virtual bar code
 
 ##### generateFinnishRefNumber() : void --> string
 - Generates a random 10 char long Finnish reference number
