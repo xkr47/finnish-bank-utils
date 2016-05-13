@@ -13,6 +13,12 @@
 })(this, function (module) {
   'use strict';
 
+  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+    return typeof obj;
+  } : function (obj) {
+    return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
+  };
+
   var _slicedToArray = function () {
     function sliceIterator(arr, i) {
       var _arr = [];
@@ -67,6 +73,7 @@
       FINNISH_REF_NUMBER_REGEX = /^(\d{4,20}|RF\d{6,23})$/i,
       FINNISH_IBAN_REGEX = /^FI\d{16}$/,
       FINNISH_VIRTUAL_BAR_CODE_REGEX = /^[45]\d{53}$/,
+      FINNISH_DATE_REGEX = /^(\d\d?)\.(\d\d?)\.(\d{4})$/,
       IBAN_OFFSET_FROM_ASCIICODE = -55;
 
   function removeAllWhiteSpaces(str) {
@@ -95,6 +102,10 @@
       return str.substr(0, str.length - strToRemove.length);
     }
     return str;
+  }
+
+  function leftPadString(str, char, pad) {
+    return (char.repeat(pad) + str).substr(-Math.max(str.length, pad));
   }
 
   function randomNumberWithLength(length) {
@@ -151,6 +162,24 @@
         number = iban.substr(4);
 
     return modForLargeNumber(lettersToNumbers(number + prefixAndChecksum), 97) === 1;
+  }
+
+  function isValidFinnishDate(string) {
+    if (!string || typeof string != 'string' || !FINNISH_DATE_REGEX.test(string)) {
+      return false;
+    }
+
+    var _string$match$slice$m = string.match(FINNISH_DATE_REGEX).slice(1, 4).map(Number);
+
+    var _string$match$slice$m2 = _slicedToArray(_string$match$slice$m, 3);
+
+    var day = _string$match$slice$m2[0];
+    var month = _string$match$slice$m2[1];
+
+    var year = _string$match$slice$m2[2];
+    var date = new Date(year, month - 1, day);
+
+    return year == date.getFullYear() && month - 1 == date.getMonth() && day == date.getDate();
   }
 
   function sliceVirtualBarCode(barCode) {
@@ -304,6 +333,39 @@
       if (day > 0 && month > 0) {
         date = day + '.' + month + '.20' + year;
       }
+
+      return { iban: iban, sum: sum, reference: reference, date: date };
+    },
+    formatFinnishVirtualBarCode: function formatFinnishVirtualBarCode(object) {
+      if (!object || (typeof object === 'undefined' ? 'undefined' : _typeof(object)) != 'object' || !this.isValidFinnishIBAN(object.iban) || typeof object.sum != 'number' || object.sum < 0 || object.sum > 999999.99 || object.sum != Number(object.sum.toFixed(2)) || !this.isValidFinnishRefNumber(object.reference) || object.date != undefined && !isValidFinnishDate(object.date)) {
+        return false;
+      }
+
+      var iban = removeAllWhiteSpaces(object.iban),
+          euros = Math.floor(object.sum),
+          cents = object.sum * 100 - euros * 100,
+          reference = removeAllWhiteSpaces(object.reference),
+          day = 0,
+          month = 0,
+          year = 0,
+          version = /^RF/.test(reference) ? 5 : 4;
+
+      if (object.date) {
+        var _object$date$match$sl = object.date.match(FINNISH_DATE_REGEX).slice(1, 4).map(Number);
+
+        var _object$date$match$sl2 = _slicedToArray(_object$date$match$sl, 3);
+
+        day = _object$date$match$sl2[0];
+        month = _object$date$match$sl2[1];
+        year = _object$date$match$sl2[2];
+      }
+
+      if (version == 5) {
+        reference = reference.replace(/^RF/, '');
+        reference = reference.substr(0, 2) + leftPadString(reference.substr(2), '0', 21);
+      }
+
+      return String(version) + iban.replace(/^FI/, '') + leftPadString(String(euros), '0', 6) + leftPadString(String(cents), '0', 2) + leftPadString(reference, '0', 23) + leftPadString(String(year).substr(-2), '0', 2) + leftPadString(String(month), '0', 2) + leftPadString(String(day), '0', 2);
 
       return { iban: iban, sum: sum, reference: reference, date: date };
     }
