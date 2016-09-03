@@ -17,8 +17,8 @@ bower install finnish-bank-utils
 ```
 
 ```html
-<!-- From npmcdn.com -->
-<script src="https://npmcdn.com/finnish-bank-utils/finnish-bank-utils.min.js"></script>
+<!-- From unpkg.com -->
+<script src="https://unpkg.com/finnish-bank-utils/finnish-bank-utils.min.js"></script>
 ```
 
 Usage
