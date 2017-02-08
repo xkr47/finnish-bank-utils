@@ -95,6 +95,9 @@ FinnishBankUtils.parseFinnishVirtualBarCode('50250004640001302000693806100000000
 # Generate a Finnish reference number
 FinnishBankUtils.generateFinnishRefNumber()
 // '6173672848'
+
+FinnishBankUtils.generateFinnishRefNumber('617367284')
+// '6173672848'
 ```
 
 ```js
@@ -124,8 +127,8 @@ Functions
 ##### parseFinnishVirtualBarCode(barCode) : string --> object
 - Parses parameter given Finnish virtual bar code
 
-##### generateFinnishRefNumber() : void --> string
-- Generates a random 10 char long Finnish reference number
+##### generateFinnishRefNumber() : string --> string
+- Generates a (possibly random 10 char long) Finnish reference number.
 
 ##### generateFinnishIBAN() : void --> string
 - Generates a random Finnish IBAN number
