@@ -277,12 +277,30 @@ describe('finnish-bank-utils', () => {
   })
 
   describe('#generateFinnishRefNumber', () => {
+    it('Should return valid reference number foreach given string', function(){
+      const initialStrings = [
+        '1234561',
+        '1511890656',
+        '559582243294671',
+        '3222190631525115',
+        '1231',
+        '0103010006717580001',
+        '3004101416423555',
+        '7758474790647489322',
+      ]
+      initialStrings.forEach(str => {
+        const ref = FinnishBankUtils.generateFinnishRefNumber(str)
+        expect(FinnishBankUtils.isValidFinnishRefNumber(ref)).to.equal(true)
+      })
+    });
+
     it('Should create valid random reference number with a sample of 10000', () => {
       for (let i = 0; i < 10000; i++) {
         const generated = FinnishBankUtils.generateFinnishRefNumber()
         expect(FinnishBankUtils.isValidFinnishRefNumber(generated)).to.equal(true)
       }
     })
+
   })
 
   describe('#generateFinnishIBAN', () => {

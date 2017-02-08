@@ -237,12 +237,15 @@ const FinnishBankUtils = {
   },
 
   /**
-   * Returns a random reference number that is 10 chars long, including checksum char
+   * Returns a reference number including checksum char. If no initial string
+   * is given, will use a random 9 char string instead.
+   * Will not preserve whitespace in the initial string.
+   * @param {String} initial - Initial string to calculate checksum for
    * @returns {String} - For example '1776750586'
    */
-  generateFinnishRefNumber() {
+  generateFinnishRefNumber(initial) {
     const
-      refNumber = randomNumberWithLength(9).toString(),
+      refNumber = initial ? removeAllWhiteSpaces(initial) : randomNumberWithLength(9).toString(),
       reversedRefNumber = reverseString(refNumber)
 
     let
