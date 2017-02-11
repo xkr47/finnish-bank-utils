@@ -290,6 +290,7 @@ describe('finnish-bank-utils', () => {
       ]
       initialStrings.forEach(str => {
         const ref = FinnishBankUtils.generateFinnishRefNumber(str)
+        expect(ref.indexOf(str)).to.be.above(-1)
         expect(FinnishBankUtils.isValidFinnishRefNumber(ref)).to.equal(true)
       })
     });

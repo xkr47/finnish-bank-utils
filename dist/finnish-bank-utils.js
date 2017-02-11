@@ -16,7 +16,7 @@
   var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
     return typeof obj;
   } : function (obj) {
-    return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
+    return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
   };
 
   var _slicedToArray = function () {
@@ -70,7 +70,7 @@
   }
 
   var REF_NUMBER_MULTIPLIERS = [7, 3, 1],
-      FINNISH_REF_NUMBER_REGEX = /^(\d{4,20}|RF\d{6,23})$/i,
+      FINNISH_REF_NUMBER_REGEX = /^(\d{4,20}|RF\d{6,22})$/i,
       FINNISH_IBAN_REGEX = /^FI\d{16}$/,
       FINNISH_VIRTUAL_BAR_CODE_REGEX = /^[45]\d{53}$/,
       FINNISH_DATE_REGEX = /^(\d\d?)\.(\d\d?)\.(\d{4})$/,
@@ -169,15 +169,12 @@
       return false;
     }
 
-    var _string$match$slice$m = string.match(FINNISH_DATE_REGEX).slice(1, 4).map(Number);
-
-    var _string$match$slice$m2 = _slicedToArray(_string$match$slice$m, 3);
-
-    var day = _string$match$slice$m2[0];
-    var month = _string$match$slice$m2[1];
-
-    var year = _string$match$slice$m2[2];
-    var date = new Date(year, month - 1, day);
+    var _string$match$slice$m = string.match(FINNISH_DATE_REGEX).slice(1, 4).map(Number),
+        _string$match$slice$m2 = _slicedToArray(_string$match$slice$m, 3),
+        day = _string$match$slice$m2[0],
+        month = _string$match$slice$m2[1],
+        year = _string$match$slice$m2[2],
+        date = new Date(year, month - 1, day);
 
     return year == date.getFullYear() && month - 1 == date.getMonth() && day == date.getDate();
   }
@@ -244,7 +241,7 @@
       return isValidFinnishBBAN(accountNumber) && isValidIBAN(accountNumber);
     },
     formatFinnishRefNumber: function formatFinnishRefNumber(refNumber) {
-      var separator = arguments.length <= 1 || arguments[1] === undefined ? ' ' : arguments[1];
+      var separator = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : ' ';
 
       if (this.isValidFinnishRefNumber(refNumber)) {
         refNumber = removeAllWhiteSpaces(refNumber.toUpperCase());
@@ -258,15 +255,15 @@
       }
     },
     formatFinnishIBAN: function formatFinnishIBAN(accountNumber) {
-      var separator = arguments.length <= 1 || arguments[1] === undefined ? ' ' : arguments[1];
+      var separator = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : ' ';
 
       if (this.isValidFinnishIBAN(accountNumber)) {
         accountNumber = removeAllWhiteSpaces(accountNumber.toUpperCase());
         return removeStringFromEnd(accountNumber.replace(/.{4}/g, '$&' + separator), separator);
       }
     },
-    generateFinnishRefNumber: function generateFinnishRefNumber() {
-      var refNumber = randomNumberWithLength(9).toString(),
+    generateFinnishRefNumber: function generateFinnishRefNumber(initial) {
+      var refNumber = typeof initial === 'string' ? removeAllWhiteSpaces(initial) : randomNumberWithLength(9).toString(),
           reversedRefNumber = reverseString(refNumber);
 
       var checksum = 0,
@@ -302,20 +299,17 @@
         return false;
       }
 
-      var _sliceVirtualBarCode = sliceVirtualBarCode(barCode);
-
-      var _sliceVirtualBarCode2 = _slicedToArray(_sliceVirtualBarCode, 9);
-
-      var version = _sliceVirtualBarCode2[0];
-      var iban = _sliceVirtualBarCode2[1];
-      var euros = _sliceVirtualBarCode2[2];
-      var cents = _sliceVirtualBarCode2[3];
-      var reserve = _sliceVirtualBarCode2[4];
-      var reference = _sliceVirtualBarCode2[5];
-      var year = _sliceVirtualBarCode2[6];
-      var month = _sliceVirtualBarCode2[7];
-      var day = _sliceVirtualBarCode2[8];
-
+      var _sliceVirtualBarCode = sliceVirtualBarCode(barCode),
+          _sliceVirtualBarCode2 = _slicedToArray(_sliceVirtualBarCode, 9),
+          version = _sliceVirtualBarCode2[0],
+          iban = _sliceVirtualBarCode2[1],
+          euros = _sliceVirtualBarCode2[2],
+          cents = _sliceVirtualBarCode2[3],
+          reserve = _sliceVirtualBarCode2[4],
+          reference = _sliceVirtualBarCode2[5],
+          year = _sliceVirtualBarCode2[6],
+          month = _sliceVirtualBarCode2[7],
+          day = _sliceVirtualBarCode2[8];
 
       version = Number(version);
 

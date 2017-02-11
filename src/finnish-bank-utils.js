@@ -245,7 +245,7 @@ const FinnishBankUtils = {
    */
   generateFinnishRefNumber(initial) {
     const
-      refNumber = initial ? removeAllWhiteSpaces(initial) : randomNumberWithLength(9).toString(),
+      refNumber = typeof initial === 'string' ? removeAllWhiteSpaces(initial) : randomNumberWithLength(9).toString(),
       reversedRefNumber = reverseString(refNumber)
 
     let

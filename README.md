@@ -127,7 +127,7 @@ Functions
 ##### parseFinnishVirtualBarCode(barCode) : string --> object
 - Parses parameter given Finnish virtual bar code
 
-##### generateFinnishRefNumber(initial) : string --> string
+##### generateFinnishRefNumber(initial) : string|void --> string
 - Generates a (possibly random 10 char long) Finnish reference number.
 
 ##### generateFinnishIBAN() : void --> string
