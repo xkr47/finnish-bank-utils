@@ -360,8 +360,6 @@
       }
 
       return String(version) + iban.replace(/^FI/, '') + leftPadString(String(euros), '0', 6) + leftPadString(String(cents), '0', 2) + leftPadString(reference, '0', 23) + leftPadString(String(year).substr(-2), '0', 2) + leftPadString(String(month), '0', 2) + leftPadString(String(day), '0', 2);
-
-      return { iban: iban, sum: sum, reference: reference, date: date };
     }
   };
 
