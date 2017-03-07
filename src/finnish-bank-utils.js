@@ -375,8 +375,6 @@ const FinnishBankUtils = {
       + leftPadString(String(year).substr(-2), '0', 2)
       + leftPadString(String(month), '0', 2)
       + leftPadString(String(day), '0', 2)
-
-    return {iban, sum, reference, date}
   }
 
 }
