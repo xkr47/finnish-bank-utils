@@ -2,7 +2,7 @@
 
 const
   REF_NUMBER_MULTIPLIERS = [7, 3, 1],
-  FINNISH_REF_NUMBER_REGEX = /^(\d{4,20}|RF\d{6,22})$/i,
+  FINNISH_REF_NUMBER_REGEX = /^(\d{4,20}|RF\d{6,24})$/i,
   FINNISH_IBAN_REGEX = /^FI\d{16}$/,
   FINNISH_VIRTUAL_BAR_CODE_REGEX = /^[45]\d{53}$/,
   FINNISH_DATE_REGEX = /^(\d\d?)\.(\d\d?)\.(\d{4})$/,
